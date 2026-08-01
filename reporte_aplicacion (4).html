@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Reporte de Aplicación · Consolidación de Agave</title>
+<meta name="theme-color" content="#2F4A3C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reporte Agave">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI5NiIgZmlsbD0iIzJGNEEzQyIvPgo8ZyBzdHJva2U9IiNGM0YxRTciIHN0cm9rZS13aWR0aD0iMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0yNTYgNDYwIEMyNTYgMzIwIDI1NiAyMTAgMjU2IDEwMCIvPgo8cGF0aCBkPSJNMjU2IDIxMCBDMTkwIDE3MCAxMzAgMTUwIDcwIDE1MCIvPgo8cGF0aCBkPSJNMjU2IDI3MCBDMzI1IDIzMCAzOTAgMjEwIDQ1MCAyMTAiLz4KPHBhdGggZD0iTTI1NiAxNTAgQzIwMCA5MCAxNDUgNTUgOTAgNDUiLz4KPHBhdGggZD0iTTI1NiAxNTAgQzMxMiA5MCAzNjcgNTUgNDIyIDQ1Ii8+CjwvZz4KPC9zdmc+">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI5NiIgZmlsbD0iIzJGNEEzQyIvPgo8ZyBzdHJva2U9IiNGM0YxRTciIHN0cm9rZS13aWR0aD0iMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0yNTYgNDYwIEMyNTYgMzIwIDI1NiAyMTAgMjU2IDEwMCIvPgo8cGF0aCBkPSJNMjU2IDIxMCBDMTkwIDE3MCAxMzAgMTUwIDcwIDE1MCIvPgo8cGF0aCBkPSJNMjU2IDI3MCBDMzI1IDIzMCAzOTAgMjEwIDQ1MCAyMTAiLz4KPHBhdGggZD0iTTI1NiAxNTAgQzIwMCA5MCAxNDUgNTUgOTAgNDUiLz4KPHBhdGggZD0iTTI1NiAxNTAgQzMxMiA5MCAzNjcgNTUgNDIyIDQ1Ii8+CjwvZz4KPC9zdmc+">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIlJlcG9ydGUgZGUgQXBsaWNhY2lvbiAtIENvbnNvbGlkYWNpb24gZGUgQWdhdmUiLCAic2hvcnRfbmFtZSI6ICJSZXBvcnRlIEFnYXZlIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNGM0YxRTciLCAidGhlbWVfY29sb3IiOiAiIzJGNEEzQyIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0S1BISmxZM1FnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJMU1USWlJSEo0UFNJNU5pSWdabWxzYkQwaUl6SkdORUV6UXlJdlBnbzhaeUJ6ZEhKdmEyVTlJaU5HTTBZeFJUY2lJSE4wY205clpTMTNhV1IwYUQwaU1UZ2lJSE4wY205clpTMXNhVzVsWTJGd1BTSnliM1Z1WkNJZ1ptbHNiRDBpYm05dVpTSStDanh3WVhSb0lHUTlJazB5TlRZZ05EWXdJRU15TlRZZ016SXdJREkxTmlBeU1UQWdNalUySURFd01DSXZQZ284Y0dGMGFDQmtQU0pOTWpVMklESXhNQ0JETVRrd0lERTNNQ0F4TXpBZ01UVXdJRGN3SURFMU1DSXZQZ284Y0dGMGFDQmtQU0pOTWpVMklESTNNQ0JETXpJMUlESXpNQ0F6T1RBZ01qRXdJRFExTUNBeU1UQWlMejRLUEhCaGRHZ2daRDBpVFRJMU5pQXhOVEFnUXpJd01DQTVNQ0F4TkRVZ05UVWdPVEFnTkRVaUx6NEtQSEJoZEdnZ1pEMGlUVEkxTmlBeE5UQWdRek14TWlBNU1DQXpOamNnTlRVZ05ESXlJRFExSWk4K0Nqd3ZaejRLUEM5emRtYysiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifV19">
+<style>
+  :root{
+    --ink:#1E2A22;
+    --agave:#2F4A3C;
+    --agave-dark:#203327;
+    --sage:#7C9885;
+    --sage-pale:#E4E9DF;
+    --cream:#F3F1E7;
+    --ochre:#C98A2A;
+    --ochre-dark:#A56E1C;
+    --water:#3D7A8A;
+    --line: rgba(30,42,34,0.14);
+    --danger:#B4432F;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height:1.4;
+    padding-bottom:60px;
+  }
+  .band{
+    background:var(--agave);
+    color:var(--cream);
+    padding:18px 16px 22px;
+    position:relative;
+  }
+  .band .eyebrow{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--sage-pale);
+    opacity:.85;
+    margin:0 0 4px;
+  }
+  .band h1{
+    margin:0;
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+  }
+  .band .sub{
+    margin-top:6px;
+    font-size:13px;
+    color:var(--sage-pale);
+    opacity:.9;
+  }
+  .band .agave-mark{
+    position:absolute;
+    right:14px;
+    top:14px;
+    width:34px;
+    height:34px;
+    opacity:.9;
+  }
+
+  .wrap{max-width:640px;margin:0 auto;padding:14px;}
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .card h2{
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin:0 0 12px;
+    color:var(--agave-dark);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2 .n{
+    background:var(--agave);
+    color:#fff;
+    width:20px;height:20px;
+    border-radius:5px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:11px;
+    flex:none;
+  }
+
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--agave-dark);
+    margin:10px 0 4px;
+  }
+  label.first{margin-top:0;}
+  input[type=text], input[type=number], select, textarea{
+    width:100%;
+    padding:10px 11px;
+    font-size:15px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:inherit;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:2px solid var(--ochre);
+    outline-offset:0px;
+    background:#fff;
+  }
+  textarea{resize:vertical;min-height:50px;}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .row3{display:grid;grid-template-columns:1.4fr 1fr 0.9fr;gap:8px;}
+
+  .geo-box{
+    display:flex; align-items:center; gap:10px;
+    background:var(--sage-pale);
+    border-radius:8px;
+    padding:10px 12px;
+    margin-top:8px;
+    font-size:13px;
+  }
+  .geo-box .dot{width:9px;height:9px;border-radius:50%;background:var(--sage);flex:none;}
+  .geo-box.ok .dot{background:var(--agave);}
+  .geo-box.err .dot{background:var(--danger);}
+  .geo-box .txt{flex:1;}
+  .geo-box .txt b{display:block;font-size:13px;color:var(--agave-dark);}
+  .geo-box .txt small{color:#5b6a5f;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:none;
+    border-radius:8px;
+    padding:11px 14px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btn-primary{background:var(--agave);color:#fff;}
+  .btn-primary:active{background:var(--agave-dark);}
+  .btn-ochre{background:var(--ochre);color:#fff;}
+  .btn-ochre:active{background:var(--ochre-dark);}
+  .btn-ghost{background:var(--sage-pale);color:var(--agave-dark);}
+  .btn-danger{background:#fff;color:var(--danger);border:1px solid var(--danger);}
+  .btn-block{width:100%;}
+  .btn-sm{padding:6px 10px;font-size:12px;}
+
+  .ing-row{
+    display:grid;
+    grid-template-columns: 1.5fr 0.8fr 0.7fr 32px;
+    gap:6px;
+    margin-bottom:6px;
+    align-items:center;
+  }
+  .ing-row input, .ing-row select{padding:8px;font-size:13.5px;}
+  .del{
+    background:none;border:none;color:var(--danger);
+    font-size:18px;cursor:pointer;line-height:1;
+  }
+
+  .tambo-card{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    background:var(--cream);
+  }
+  .tambo-card .head{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:13px;font-weight:700;color:var(--agave-dark);
+    margin-bottom:4px;
+  }
+  .tambo-card .meta{font-size:12px;color:#5b6a5f;margin-bottom:6px;}
+  .tambo-card ul{margin:0;padding-left:16px;font-size:13px;}
+  .tambo-card ul li{margin-bottom:1px;}
+
+  .evid-block{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+  }
+  .foto-slot{
+    margin-bottom:8px;
+  }
+  .foto-slot .lbl{
+    font-size:12px;
+    color:#4a5a4d;
+    margin-bottom:4px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .foto-slot .badge{
+    background:var(--agave);
+    color:#fff;
+    font-size:10px;
+    font-weight:700;
+    padding:1px 6px;
+    border-radius:20px;
+    letter-spacing:.03em;
+  }
+  .foto-capture-btn{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    border:1.5px dashed var(--sage);
+    border-radius:8px;
+    padding:14px 10px;
+    color:var(--agave-dark);
+    font-size:12.5px;
+    font-weight:600;
+    background:#fff;
+    cursor:pointer;
+    text-align:center;
+  }
+  .foto-thumb-wrap{
+    position:relative;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .foto-thumb-wrap img{
+    display:block;
+    width:100%;
+    max-height:170px;
+    object-fit:cover;
+  }
+  .foto-thumb-actions{
+    display:flex;gap:6px;
+    background:#fff;
+    padding:6px;
+  }
+  .foto-thumb-actions .btn{flex:1;padding:7px 8px;font-size:11.5px;}
+  .ph-slot{
+    background:#FBEFDD;
+    border-radius:8px;
+    padding:10px;
+    margin-top:8px;
+  }
+  .ph-slot-head{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ochre-dark);
+    margin-bottom:6px;
+  }
+
+  .galeria-general{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:10px;
+  }
+  .galeria-item{
+    position:relative;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+  .galeria-item img{
+    display:block;width:100%;height:100px;object-fit:cover;
+  }
+  .galeria-item .cap{
+    font-size:10.5px;
+    padding:4px 6px;
+    color:#4a5a4d;
+    display:flex;justify-content:space-between;align-items:center;
+    gap:4px;
+  }
+  .galeria-item .cap button{
+    background:none;border:none;color:var(--danger);font-size:14px;cursor:pointer;line-height:1;
+  }
+  .kml-card{
+    margin-top:10px;
+    background:var(--sage-pale);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13px;
+  }
+  .kml-card b{display:block;color:var(--agave-dark);font-size:13.5px;margin-bottom:2px;}
+  .kml-card .kml-remove{
+    margin-top:8px;
+  }
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(20,28,22,0.55);
+    z-index:999;
+    overflow-y:auto;
+    padding:16px 10px 40px;
+  }
+  .modal-panel{
+    background:#fff;
+    max-width:620px;
+    margin:0 auto;
+    border-radius:12px;
+    padding:16px;
+  }
+  .modal-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:10px;
+  }
+  .modal-head h2{
+    font-size:16px; margin:0; color:var(--agave-dark);
+  }
+  .historial-item{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    background:var(--cream);
+  }
+  .historial-item .top{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:13.5px; font-weight:700; color:var(--agave-dark);
+  }
+  .historial-item .sub{font-size:12px;color:#5b6a5f;margin:2px 0 8px;}
+  .detalle-section{margin-bottom:14px;}
+  .detalle-section h3{
+    font-size:12.5px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--agave-dark); margin:0 0 6px;
+    border-bottom:1px solid var(--line); padding-bottom:4px;
+  }
+  .detalle-section table{width:100%;font-size:13px;border-collapse:collapse;}
+  .detalle-section td{padding:3px 4px;border-bottom:1px solid var(--line);}
+  .detalle-fotos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px;}
+  .detalle-fotos img{width:100%;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--line);}
+  .detalle-fotos .cap{font-size:9.5px;text-align:center;color:#5b6a5f;margin-top:2px;}
+
+  .firma-wrap{
+    border:1.5px dashed var(--sage);
+    border-radius:8px;
+    background:#fff;
+    touch-action:none;
+  }
+  #firmaCanvas{
+    width:100%;
+    height:180px;
+    display:block;
+    touch-action:none;
+  }
+
+  .summary-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    margin-bottom:12px;
+  }
+  .stat{
+    background:var(--sage-pale);
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .stat .v{font-size:22px;font-weight:800;color:var(--agave-dark);}
+  .stat .l{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#5b6a5f;}
+  .stat.water{background:#E4F0F2;}
+  .stat.water .v{color:var(--water);}
+  .stat.progress{background:#FBEFDD;}
+  .stat.progress .v{color:var(--ochre-dark);}
+
+  table.resumen{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px;}
+  table.resumen th, table.resumen td{
+    text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);
+  }
+  table.resumen th{color:var(--agave-dark);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;}
+  table.resumen td.num{text-align:right;font-variant-numeric:tabular-nums;}
+
+  .progress-bar{
+    height:10px;border-radius:6px;background:var(--sage-pale);overflow:hidden;margin-top:6px;
+  }
+  .progress-bar .fill{height:100%;background:var(--ochre);border-radius:6px;transition:width .3s;}
+
+  .actions-sticky{
+    position:sticky;bottom:0;
+    background:linear-gradient(to top, var(--cream) 70%, transparent);
+    padding:12px 14px 8px;
+    display:flex;gap:8px;
+  }
+  .hint{font-size:11.5px;color:#5b6a5f;margin-top:6px;}
+  .save-flag{
+    font-size:11.5px;color:var(--agave);font-weight:700;
+    display:flex;align-items:center;gap:5px;
+  }
+  .save-flag .dot{width:7px;height:7px;border-radius:50%;background:var(--agave);}
+
+  .empty{
+    font-size:13px;color:#7a8a7d;text-align:center;padding:14px 0;
+  }
+
+  select.receta-select{margin-top:8px;}
+
+  @media print{
+    .no-print{display:none !important;}
+    body{background:#fff;}
+    .card{border:1px solid #999;break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<div class="band">
+  <svg class="agave-mark" viewBox="0 0 48 48" fill="none">
+    <path d="M24 44 C24 30 24 20 24 10" stroke="#F3F1E7" stroke-width="2" stroke-linecap="round"/>
+    <path d="M24 20 C18 16 12 14 6 14" stroke="#F3F1E7" stroke-width="2" stroke-linecap="round"/>
+    <path d="M24 26 C30 22 36 20 42 20" stroke="#F3F1E7" stroke-width="2" stroke-linecap="round"/>
+    <path d="M24 14 C19 8 14 5 8 4" stroke="#F3F1E7" stroke-width="2" stroke-linecap="round"/>
+    <path d="M24 14 C29 8 34 5 40 4" stroke="#F3F1E7" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+  <p class="eyebrow">Consolidación de Agave · Manejo de malezas</p>
+  <h1>Reporte de aplicación</h1>
+  <p class="sub" id="subHeader">Preemergente / Postemergente — captura de campo</p>
+  <button class="btn btn-ghost btn-sm no-print" id="installBtn" onclick="instalarApp()" style="margin-top:10px;">📲 Agregar a pantalla de inicio</button>
+  <p class="hint no-print" style="color:var(--sage-pale);opacity:.85;margin-top:6px;">Para instalar, primero descarga este archivo y ábrelo directo en Chrome o Safari de tu teléfono.</p>
+</div>
+
+<div class="wrap">
+
+  <div class="card" id="avisoInseguro" style="display:none;background:#FBEFDD;border-color:var(--ochre);">
+    <h2 style="color:var(--ochre-dark);"><span class="n" style="background:var(--ochre);">!</span>GPS e instalación no disponibles aquí</h2>
+    <p class="hint" style="margin-top:0;font-size:13px;color:#5b4a1e;">
+      Este archivo se abrió como archivo local, y por seguridad los navegadores bloquean el GPS y la instalación como app en ese modo (no es un error del formulario). El resto del formulario funciona normal, incluida la cámara.
+    </p>
+    <p class="hint" style="font-size:13px;color:#5b4a1e;">
+      <b>Solución rápida y gratis:</b> sube este archivo .html a <b>app.netlify.com/drop</b> (arrastrar y soltar, sin necesidad de cuenta) y abre el enlace https:// que te den en tu teléfono — ahí sí funcionan el GPS y la instalación.
+    </p>
+  </div>
+
+  <!-- 1. DATOS GENERALES -->
+  <div class="card">
+    <h2><span class="n">1</span>Datos de la jornada</h2>
+
+    <label class="first">Fecha y hora de inicio</label>
+    <input type="text" id="fechaHora" readonly>
+
+    <div class="row2">
+      <div>
+        <label>Jefe de Área</label>
+        <select id="jefeAreaSelect" onchange="onJefeAreaChange(this.value)"></select>
+      </div>
+      <div>
+        <label>Supervisor</label>
+        <select id="supervisorSelect" onchange="onSupervisorChange(this.value)"></select>
+      </div>
+    </div>
+
+    <label>Tipo de aplicación</label>
+    <select id="tipoAplicacion" onchange="onTipoChange(this.value)">
+      <option value="Preemergente">Preemergente</option>
+      <option value="Postemergente">Postemergente</option>
+    </select>
+
+    <label>Parcela / rancho (catálogo de inventario)</label>
+    <select id="parcelaSelect" onchange="onParcelaChange(this.value)"></select>
+    <input type="text" id="parcelaManual" placeholder="Nombre de la parcela" style="display:none;margin-top:6px;">
+
+    <label>Inventario de la parcela (plantas totales a tratar)</label>
+    <input type="number" id="inventarioParcela" min="0" placeholder="Ej. 12000" inputmode="numeric">
+    <p class="hint" id="parcelaInfoHint">Selecciona una parcela del catálogo para autocompletar el inventario y las hectáreas.</p>
+
+    <label>Ubicación</label>
+    <div class="geo-box" id="geoBox">
+      <div class="dot"></div>
+      <div class="txt">
+        <b id="geoTxt">Ubicación no capturada</b>
+        <small id="geoSub">Toca "Capturar ubicación" al llegar a la parcela</small>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="capturarUbicacion()">📍 Capturar ubicación (GPS)</button>
+
+    <div id="ubicacionManualBox" style="display:none;margin-top:10px;">
+      <p class="hint" style="margin-top:0;">El GPS del navegador no está disponible aquí. Captura las coordenadas manualmente (puedes copiarlas de Google Maps: mantén el dedo en tu ubicación y copia los números que aparecen).</p>
+      <div class="row2">
+        <div><label class="first">Latitud</label><input type="text" id="latManual" placeholder="Ej. 20.912"></div>
+        <div><label class="first">Longitud</label><input type="text" id="lonManual" placeholder="Ej. -103.442"></div>
+      </div>
+      <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="usarUbicacionManual()" type="button">Usar estas coordenadas</button>
+    </div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="mostrarUbicacionManual()" type="button">✏️ Escribir coordenadas a mano</button>
+  </div>
+
+  <!-- 2. RECETA POR TAMBO -->
+  <div class="card">
+    <h2><span class="n">2</span>Receta por tambo (200 L)</h2>
+    <p class="hint" style="margin-top:-6px;margin-bottom:8px;">Define la mezcla base para un tambo de 200 litros. Se usará como plantilla al registrar cada tambo aplicado.</p>
+
+    <label class="first">Cargar receta predefinida (catálogo de la empresa)</label>
+    <select id="recetaPreset" onchange="cargarRecetaPreset(this.value)">
+      <option value="">— Receta personalizada —</option>
+      <option value="pre_0_3">Pre-emergente al hilo (sello) · Edad 0-3 años</option>
+      <option value="pre_4_6">Pre-emergente al hilo (sello) · Edad 4-6 años</option>
+    </select>
+    <p class="hint" style="margin-bottom:10px;">Las dosis del catálogo son de referencia por hectárea; ajusta las cantidades de cada insumo según el agua real del tambo de 200 L antes de registrar el tambo.</p>
+
+    <div id="recetaRows"></div>
+    <button class="btn btn-ghost btn-sm" onclick="agregarInsumoReceta()">+ Agregar insumo</button>
+  </div>
+
+  <!-- 3. REGISTRO DE TAMBOS -->
+  <div class="card">
+    <h2><span class="n">3</span>Tambos aplicados en la jornada</h2>
+    <p class="hint" style="margin-top:-6px;margin-bottom:8px;">Cada vez que se prepara y aplica un tambo de 200 L, regístralo aquí. Se cargan las cantidades de la receta; ajústalas si ese tambo varió.</p>
+
+    <button class="btn btn-primary btn-block" onclick="abrirNuevoTambo()">+ Registrar tambo aplicado</button>
+
+    <div id="tambosLista" style="margin-top:12px;"></div>
+    <div class="empty" id="tambosEmpty">Aún no se han registrado tambos.</div>
+  </div>
+
+  <!-- 4. EVIDENCIAS GENERALES Y POLÍGONO -->
+  <div class="card">
+    <h2><span class="n">4</span>Evidencias generales y polígono de trabajo</h2>
+
+    <label class="first">Fotografías de evidencia adicionales</label>
+    <p class="hint" style="margin-top:-2px;">Fotos generales de la jornada que no correspondan a un tambo en particular (acceso, letrero de la parcela, equipo, etc.).</p>
+    <label class="foto-capture-btn" for="fotoGeneralInput" style="margin-top:6px;">
+      📷 Agregar fotografía de evidencia
+      <input type="file" id="fotoGeneralInput" accept="image/*" capture="environment" style="display:none;" onchange="onFotoGeneral(this)">
+    </label>
+    <div id="galeriaGeneral" class="galeria-general"></div>
+
+    <label>Polígono KML de la superficie trabajada</label>
+    <p class="hint" style="margin-top:-2px;">Sube el archivo .kml del polígono de la parcela sobre la que se trabajó en esta jornada.</p>
+    <label class="foto-capture-btn" for="kmlInput" style="margin-top:6px;">
+      🗺️ Cargar archivo KML
+      <input type="file" id="kmlInput" accept=".kml,application/vnd.google-earth.kml+xml" style="display:none;" onchange="onKmlInput(this)">
+    </label>
+    <div id="kmlInfo"></div>
+  </div>
+
+  <!-- 5. RESUMEN GENERAL -->
+  <div class="card">
+    <h2><span class="n">5</span>Resumen general de la jornada</h2>
+
+    <div class="summary-grid">
+      <div class="stat">
+        <div class="v" id="sumTambos">0</div>
+        <div class="l">Tambos realizados</div>
+      </div>
+      <div class="stat water">
+        <div class="v" id="sumAgua">0 L</div>
+        <div class="l">Agua consumida</div>
+      </div>
+      <div class="stat progress">
+        <div class="v" id="sumAvance">0</div>
+        <div class="l">Plantas tratadas (avance)</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="sumRestante">0</div>
+        <div class="l">Restante por aplicar</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="sumEvidencias">0</div>
+        <div class="l">Evidencias fotográficas</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="sumPhProm">—</div>
+        <div class="l">pH de mezcla (promedio)</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="sumPhAguaProm">—</div>
+        <div class="l">pH de agua (promedio)</div>
+      </div>
+    </div>
+
+    <div class="progress-bar"><div class="fill" id="progFill" style="width:0%"></div></div>
+    <p class="hint" id="progLabel">0% del inventario de la parcela tratado</p>
+
+    <table class="resumen">
+      <thead><tr><th>Insumo</th><th class="num">Consumo total</th></tr></thead>
+      <tbody id="tablaInsumos"></tbody>
+    </table>
+
+    <label>Observaciones de la jornada</label>
+    <textarea id="observaciones" placeholder="Incidencias, clima, equipo, etc."></textarea>
+  </div>
+
+  <!-- 6. AVANCE DIARIO Y JORNALEROS -->
+  <div class="card">
+    <h2><span class="n">6</span>Avance diario y jornaleros</h2>
+
+    <label class="first">Avance diario en plantas</label>
+    <input type="number" id="avanceDiario" min="0" placeholder="0">
+    <p class="hint" id="avanceDiarioHint">Captura aquí manualmente el total de plantas tratadas en el día.</p>
+
+    <label>Número de jornaleros requeridos</label>
+    <input type="number" id="jornalerosReq" min="0" placeholder="Ej. 6">
+
+    <div class="summary-grid" style="margin-top:12px;">
+      <div class="stat">
+        <div class="v" id="avanceRendimiento">—</div>
+        <div class="l">Plantas por jornalero</div>
+      </div>
+      <div class="stat progress">
+        <div class="v" id="avanceFaltante">0</div>
+        <div class="l">Faltante por aplicar en la parcela</div>
+      </div>
+    </div>
+    <p class="hint">Faltante = inventario real de la parcela − avance diario en plantas.</p>
+  </div>
+
+  <!-- 7. FIRMA DE AUDITOR -->
+  <div class="card">
+    <h2><span class="n">7</span>Validación del auditor</h2>
+    <label class="first">Nombre del auditor</label>
+    <input type="text" id="auditorNombre" value="Jorge López Carranza">
+
+    <label>Firma</label>
+    <div class="firma-wrap">
+      <canvas id="firmaCanvas" width="600" height="180"></canvas>
+    </div>
+    <div class="row2" style="margin-top:8px;">
+      <button class="btn btn-ghost" onclick="limpiarFirma()" type="button">Borrar firma</button>
+      <button class="btn btn-primary" onclick="guardarFirma()" type="button">Guardar firma</button>
+    </div>
+    <p class="hint" id="firmaEstado">Sin firmar</p>
+  </div>
+
+  <div class="save-flag no-print" id="saveFlag">
+    <span class="dot"></span> Guardado automáticamente en este dispositivo
+  </div>
+  <button class="btn btn-ghost btn-sm no-print" style="margin-top:8px;" onclick="exportarJSON()" type="button">⬇️ Exportar respaldo JSON de esta jornada</button>
+
+</div>
+
+<div class="actions-sticky no-print">
+  <button class="btn btn-ghost" style="flex:1" onclick="abrirHistorial()">🗂️ Historial</button>
+  <button class="btn btn-ochre" style="flex:1" onclick="generarPdfRegistro(estado)">📄 PDF</button>
+  <button class="btn btn-danger" style="flex:none" onclick="nuevaJornada()">Nueva jornada</button>
+</div>
+
+<!-- HISTORIAL DE JORNADAS -->
+<div class="modal-overlay no-print" id="historialOverlay" style="display:none;">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h2>Historial de jornadas</h2>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarHistorial()" type="button">Cerrar ✕</button>
+    </div>
+    <p class="hint" style="margin-top:0;">Cada vez que tocas "Nueva jornada" se guarda automáticamente una copia de la jornada anterior aquí, con sus fotografías.</p>
+    <label class="first">Filtrar por parcela</label>
+    <select id="historialFiltroParcela" onchange="pintarHistorial()"></select>
+    <div id="historialLista" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- DETALLE DE UN REGISTRO DEL HISTORIAL -->
+<div class="modal-overlay no-print" id="detalleOverlay" style="display:none;">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h2>Detalle de la jornada</h2>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarDetalle()" type="button">Cerrar ✕</button>
+    </div>
+    <div id="detalleContenido"></div>
+    <button class="btn btn-ochre btn-block" style="margin-top:12px;" onclick="generarPdfDesdeDetalle()" type="button">📄 Generar PDF de este registro</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- Catálogos (INVENTARIO_PARCELAS_CONSOLIDACION_DE_AGAVE.xlsx + control_pre_y_postemergente.xlsx) ---------------- */
+const INVENTARIO = [
+  {rancho:'2.4', anio:2020, contrato:'SAN PEDRO 2020', has:11.0, inventario:44609},
+  {rancho:'2.5', anio:2021, contrato:'SAN PEDRO 2021', has:25.6, inventario:85960},
+  {rancho:'52', anio:2020, contrato:'RAQUEL CERVANTEZ', has:5.02, inventario:5620},
+  {rancho:'55', anio:2020, contrato:'MOISES LOPEZ HERNANDEZ', has:7.4, inventario:18880},
+  {rancho:'58', anio:2020, contrato:'LEONARDO RAYGOZA DELGADO', has:9.41, inventario:29603},
+  {rancho:'61', anio:2020, contrato:'JONAS LOPEZ FLORES', has:6.6, inventario:15642},
+  {rancho:'62', anio:2020, contrato:'JUAN ZAMBRANO', has:4.0, inventario:14221},
+  {rancho:'63', anio:2020, contrato:'JOSE SANTOS RUBIO TORRES', has:4.76, inventario:11294},
+  {rancho:'64', anio:2020, contrato:'LORENZA BAÑUELOS', has:9.5, inventario:26984},
+  {rancho:'65', anio:2020, contrato:'ANTONIO RAYGOZA DELGADO', has:4.5, inventario:15892},
+  {rancho:'68', anio:2020, contrato:'VICTOR GUERRERO GALLARDO', has:3.07, inventario:5126},
+  {rancho:'70', anio:2020, contrato:'RIGOBERTO RODRIGUEZ HERRERA', has:13.17, inventario:29460},
+  {rancho:'72', anio:2020, contrato:'RUBEN MANZANO (PREDIO 1)', has:4.68, inventario:18067},
+  {rancho:'73', anio:2020, contrato:'RUBEN MANZANO (PREDIO 2)', has:2.24, inventario:7609},
+  {rancho:'74', anio:2020, contrato:'SALCEDO 2020', has:4.64, inventario:13454},
+  {rancho:'75', anio:2020, contrato:'JUAN GONZALEZ RODRIGUEZ (EL CERRITO)', has:7.59, inventario:17056},
+  {rancho:'76', anio:2020, contrato:'RAMIRO RAMIREZ LOPEZ', has:10.0, inventario:32310},
+  {rancho:'77', anio:2021, contrato:'MARTINIANO VALLARTA LOPEZ', has:5.2811, inventario:17901},
+  {rancho:'78', anio:2021, contrato:'ENEDINO GALLEGOS MOYA (PREDIO 1)', has:14.243, inventario:52383},
+  {rancho:'79', anio:2021, contrato:'ENEDINO GALLEGOS MOYA (PREDIO 2)', has:8.7154, inventario:29493},
+  {rancho:'82', anio:2021, contrato:'PRIMITIVO BAÑUELOS ALVAREZ', has:5.5365, inventario:17534},
+  {rancho:'83', anio:2021, contrato:'BENITO BAÑUELOS ALVAREZ', has:3.0701, inventario:10119},
+  {rancho:'84', anio:2021, contrato:'SUSANA ARELLANO VILLAGRANA', has:5.96, inventario:21062},
+  {rancho:'84.1', anio:2021, contrato:'SUSANA ARELLANO VILLAGRANA', has:11.4, inventario:42530},
+  {rancho:'85', anio:2021, contrato:'JULIAN SALAS ALTAMIRANO', has:20.47, inventario:66594},
+  {rancho:'86', anio:2021, contrato:'JOSE GUADALUPE MIRAMONTES HERNANDEZ', has:9.51, inventario:31636},
+  {rancho:'87', anio:2021, contrato:'J ISAAC PERALES CERVANTES', has:7.8872, inventario:25161},
+  {rancho:'88', anio:2021, contrato:'ALFREDO GUZMAN CERVANTES', has:4.0375, inventario:13978},
+  {rancho:'89', anio:2021, contrato:'J JESUS RODRIGUEZ CORTES', has:3.0038, inventario:10549},
+  {rancho:'90', anio:2021, contrato:'AUSENCIO ROJAS PIZ', has:4.2359, inventario:17429},
+  {rancho:'92', anio:2021, contrato:'QUIRINO HAROS ZUÑIGA', has:4.87, inventario:18980},
+  {rancho:'93', anio:2021, contrato:'FIDEL GONZALEZ VARELA', has:3.64, inventario:11115},
+  {rancho:'94', anio:2021, contrato:'FRANCISCO JAVIER MONRROY MARTINEZ', has:12.0, inventario:39645},
+  {rancho:'95', anio:2021, contrato:'PATRICIA GARCIA BUENO', has:17.339, inventario:57602},
+  {rancho:'96', anio:2021, contrato:'ADELAIDA CERVANTES MIRAMONTES', has:12.0, inventario:41231},
+  {rancho:'97', anio:2021, contrato:'OSCAR CERVANTES MIRAMONTES', has:7.4089, inventario:26816},
+  {rancho:'98', anio:2021, contrato:'LETICIA CERVANTES MIRAMONTES', has:2.37, inventario:8040},
+  {rancho:'99', anio:2021, contrato:'NORMA ALICIA HAROS SOLIS', has:3.6, inventario:14049},
+  {rancho:'100', anio:2021, contrato:'MARCELINO SOLIS HIDALGO', has:1.38, inventario:5269},
+  {rancho:'102', anio:2021, contrato:'FRANCISCO JAVIER CARRILLO LOPEZ', has:12.0, inventario:34315},
+  {rancho:'103', anio:2021, contrato:'FRANCISCO  HIDALGO ROMERO', has:3.7679, inventario:8468},
+  {rancho:'104', anio:2021, contrato:'MARIA DEL CARMEN ROMERO IBARRA (LAS CALABAZAS)', has:10.0, inventario:45791},
+  {rancho:'105', anio:2021, contrato:'MARTIN SALINAS CASTAÑEDA', has:2.12, inventario:6887},
+  {rancho:'106', anio:2022, contrato:'JOSEFINA SALAZAR RIVAS', has:7.3, inventario:25771},
+  {rancho:'107', anio:2022, contrato:'J. ABEL MARTINEZ RODRIGUEZ', has:50.0, inventario:154193},
+  {rancho:'108', anio:2022, contrato:'HÉCTOR MANUEL OROZCO DÍAZ', has:20.0, inventario:76005},
+  {rancho:'109', anio:2022, contrato:'JOSE LEOPOLDO LINARES CALDERA (1)', has:13.5, inventario:62251},
+  {rancho:'110', anio:2022, contrato:'JOSE LEOPOLDO LINARES CALDERA (2)', has:2.8, inventario:11287},
+  {rancho:'112', anio:2022, contrato:'JOSE SABINO ESCOBEDO ROJAS', has:4.0, inventario:17057},
+  {rancho:'113', anio:2022, contrato:'PABLO CARRILLO PEÑA', has:12.0, inventario:51318},
+  {rancho:'114', anio:2022, contrato:'JOSE CARRILLO CARO', has:10.0, inventario:49311},
+  {rancho:'115', anio:2022, contrato:'JOSE ENRIQUE ESPARZA MARTINEZ (2)', has:5.0, inventario:19290},
+  {rancho:'116', anio:2022, contrato:'JOSE ENRIQUE ESPARZA MARTINEZ (1)', has:4.0, inventario:16260},
+  {rancho:'117', anio:2022, contrato:'MARIA FELICITAS NAVARRO LOPEZ', has:10.5, inventario:29542},
+  {rancho:'118', anio:2022, contrato:'CATALINA BRAVO NUÑEZ', has:14.0, inventario:68813},
+  {rancho:'122', anio:2022, contrato:'FRANCISCO BAUTISTA CABRALES', has:20.0, inventario:51464},
+  {rancho:'124', anio:2023, contrato:'ROGELIO RODRIGUEZ PALACIOS', has:7.0, inventario:20990},
+  {rancho:'125', anio:2022, contrato:'RAFAEL LLAMAS LLAMAS', has:20.0, inventario:65000},
+  {rancho:'127', anio:2022, contrato:'JUAN MARQUEZ ALVAREZ 2022', has:5.0, inventario:21689},
+  {rancho:'128', anio:2022, contrato:'DARIO MESTAS CARO 2022', has:7.0, inventario:26743},
+  {rancho:'129', anio:2022, contrato:'ROSENDO LOPEZ CARRIILO', has:12.7992, inventario:46077},
+  {rancho:'131', anio:2023, contrato:'J. ABEL MARTINEZ RODRIGUEZ 2023', has:13.0, inventario:50320},
+  {rancho:'133', anio:2023, contrato:'SANTIAGO MERCADO RODRIGUEZ  2023 COLUMPIO EXTREMO (1)', has:7.64, inventario:25668},
+  {rancho:'133.1', anio:2023, contrato:'SANTIAGO MERCADO RODRIGUEZ  2023  CFE (2)', has:7.1, inventario:23970},
+  {rancho:'134', anio:2023, contrato:'EMILIA FLORES RAYGOZA 2023', has:7.88, inventario:28712},
+  {rancho:'135', anio:2023, contrato:'ALEJANDRO PEÑA CARRILLO 2023', has:4.46, inventario:15278},
+  {rancho:'136', anio:2023, contrato:'ALFREDO GUZMAN CERVANTES PREDIO II 2023', has:4.03, inventario:15458},
+  {rancho:'137', anio:2023, contrato:'ELIAS OROZCO DIAZ 2023 (EL MIRADOR)', has:20.9, inventario:73040},
+  {rancho:'138', anio:2023, contrato:'EMILIANO ROJAS PIZ 2023', has:11.3, inventario:39252},
+  {rancho:'139', anio:2023, contrato:'EZEQUIEL AMAYA DIAZ 2023', has:8.0, inventario:36478},
+  {rancho:'140', anio:2023, contrato:'FRANCISCA PIZ SALAZAR 2023', has:6.0, inventario:25000},
+  {rancho:'141', anio:2023, contrato:'RAUDEL MORENO PIZ 2023', has:2.38, inventario:8887},
+  {rancho:'142', anio:2023, contrato:'HERNA LICIA TOPETE 2023', has:6.0, inventario:21466},
+  {rancho:'143', anio:2023, contrato:'J CARMEN PIZ SALAZAR 2023', has:10.37, inventario:39269},
+  {rancho:'144', anio:2023, contrato:'JOSE AMEZQUITA TORRES 2023', has:12.14, inventario:41380},
+  {rancho:'145', anio:2023, contrato:'JOSE CARMEN PIZ RODRIGUEZ 2023', has:6.0, inventario:19730},
+  {rancho:'147', anio:2023, contrato:'LEANDRO AMAYA DIAZ I 2023', has:3.75, inventario:12315},
+  {rancho:'148', anio:2023, contrato:'LEANDRO AMAYA DIAZ II 2023', has:8.6, inventario:30101},
+  {rancho:'149', anio:2023, contrato:'LEANDRO PEÑA CARRILLO 2023', has:8.5, inventario:30219},
+  {rancho:'150', anio:2023, contrato:'MARIA SANTOS NUÑEZ 2023', has:6.8, inventario:23439},
+  {rancho:'151', anio:2023, contrato:'MIGUEL PEÑA TAMAYO 2023', has:6.1, inventario:17752},
+  {rancho:'152', anio:2023, contrato:'RAYMUNDO PEREZ I 2023', has:12.5, inventario:43226},
+  {rancho:'153', anio:2023, contrato:'RAYMUNDO PEREZ II 2023', has:7.4, inventario:21159},
+  {rancho:'154', anio:2023, contrato:'RUBEN MORENO PIZ 2023', has:4.45, inventario:20447},
+  {rancho:'154.2', anio:2023, contrato:'RUBEN MORENO PIZ 2023 (2)', has:3.0, inventario:13785},
+  {rancho:'154.3', anio:2023, contrato:'RUBEN MORENO PIZ 2023 (3)', has:1.36, inventario:6256},
+  {rancho:'155', anio:2023, contrato:'SUSANA ARELLANO VILLAGRANA PREDIO 2023', has:7.3, inventario:24981},
+  {rancho:'156', anio:2023, contrato:'OSCAR PEÑA CARRILLO', has:8.0, inventario:31288},
+  {rancho:'157', anio:2023, contrato:'JOSEFINA VARELA LÓPEZ', has:3.5, inventario:13031},
+  {rancho:'158', anio:2025, contrato:'SALVADOR BARAJAS CABRERA 2025', has:7.75, inventario:22876},
+  {rancho:'159', anio:2025, contrato:'JUAN MARQUEZ ALVAREZ 2025', has:5.24, inventario:15291},
+  {rancho:'160', anio:2025, contrato:'PARCELA COMUNAL MAGDALENA (MONIGOTES) 2025', has:42.0, inventario:132381},
+  {rancho:'161', anio:2025, contrato:'MARIA GUADALUPE CARRILLO RODRIGEZ 2025 (EL PANTEÓN MGD)', has:8.41, inventario:28090},
+  {rancho:'162', anio:2025, contrato:'LILIA GUERRERO GALLARDO 2025', has:6.56, inventario:16183},
+  {rancho:'162.1', anio:2025, contrato:'LILIA GUERRERO GALLARDO 2025 (2)', has:1.76, inventario:4340},
+  {rancho:'163', anio:2025, contrato:'VICENTE CERVANTES VARGAS 2025', has:9.6, inventario:29398},
+  {rancho:'164', anio:2025, contrato:'ESTEBAN VALLARTA MARQUEZ 2025', has:2.72, inventario:8067},
+  {rancho:'164.1', anio:2025, contrato:'ESTEBAN VALLARTA MARQUEZ 2025 (2)', has:1.28, inventario:3797},
+  {rancho:'165', anio:2025, contrato:'ANTONIO RUBIO PIZ 2025', has:2.0, inventario:6442},
+  {rancho:'166', anio:2025, contrato:'DANIEL RUBIO 2025', has:2.0, inventario:6294},
+  {rancho:'167', anio:2025, contrato:'BERNARDO GARCIA 2025', has:2.5, inventario:8910},
+  {rancho:'168', anio:2026, contrato:'SALVADOR BARAJAS CABRERA 2026', has:4.44, inventario:14716},
+  {rancho:'169', anio:2026, contrato:'EL BASURERO-EJIDO MAGDALENA 2026', has:11.2, inventario:37300},
+  {rancho:'169.2', anio:2026, contrato:'EL BASURERO-EJIDO MAGDALENA 2026', has:5.93, inventario:19601},
+  {rancho:'169.3', anio:2026, contrato:'EL BASURERO-EJIDO MAGDALENA 2026', has:1.65, inventario:6039},
+  {rancho:'170', anio:2026, contrato:'JOSE ALEJANDRO VARELA HERNANDEZ 2026', has:4.48, inventario:14252},
+  {rancho:'171', anio:2026, contrato:'TERESA HERNANDEZ TAMAYO 2026 (MARCOS GALLEGOS)', has:3.98, inventario:11883},
+  {rancho:'172', anio:2026, contrato:'HIPOLITO Y JUAN ESPINOZA 2026 (LAS ENGORDAS)', has:24.0, inventario:80895},
+  {rancho:'173', anio:2026, contrato:'ELIAS MESTAS DAVALOS 2026', has:7.0, inventario:23994},
+  {rancho:'175', anio:2026, contrato:'GUSTAVO PEREZ SALMERON 2026', has:5.75, inventario:18374},
+  {rancho:'176', anio:2026, contrato:'PABLO GARCIA MENCHACA 2026', has:1.93, inventario:7062},
+  {rancho:'177', anio:2026, contrato:'LUIS JORGE RAMOS VIELMAS 2026', has:19.7, inventario:60385}
+];
+
+const KEY_CATALOGO_JEFES = 'agave_catalogo_jefes_area';
+const KEY_CATALOGO_SUPERVISORES = 'agave_catalogo_supervisores';
+const DEFAULT_JEFES = ['Alejandro Ramirez'];
+const DEFAULT_SUPERVISORES = ['Emanuel Rubio'];
+
+function cargarCatalogo(key, defecto){
+  try{
+    const raw = localStorage.getItem(key);
+    if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr) && arr.length) return arr; }
+  }catch(e){}
+  return defecto.slice();
+}
+function guardarCatalogo(key, arr){
+  try{ localStorage.setItem(key, JSON.stringify(arr)); }catch(e){}
+}
+
+const RECETAS_PRESET = {
+  pre_0_3: {
+    label:'Pre-emergente al hilo (sello) · Edad 0-3 años',
+    ingredientes:[
+      {nombre:'PHASE 1', cantidad:0.35, unidad:'l'},
+      {nombre:'KROVAR', cantidad:2.5, unidad:'kg'},
+      {nombre:'ATRAZINA', cantidad:2, unidad:'kg'},
+      {nombre:'ASSURE 2', cantidad:0.25, unidad:'l'},
+      {nombre:'BREAK THRU', cantidad:0.1, unidad:'l'}
+    ]
+  },
+  pre_4_6: {
+    label:'Pre-emergente al hilo (sello) · Edad 4-6 años',
+    ingredientes:[
+      {nombre:'PHASE 1', cantidad:0.35, unidad:'l'},
+      {nombre:'DIURON', cantidad:2, unidad:'kg'},
+      {nombre:'ATRAZINA', cantidad:2, unidad:'kg'},
+      {nombre:'ASSURE 2', cantidad:0.25, unidad:'l'},
+      {nombre:'BREAK THRU', cantidad:0.1, unidad:'l'},
+      {nombre:'LUCAZINONA', cantidad:0.85, unidad:'l'}
+    ]
+  }
+};
+
+/* ---------------- Estado ---------------- */
+const STORAGE_KEY = 'agave_reporte_actual';
+let estado = {
+  fechaHora: '',
+  jefeArea: '',
+  supervisor: '',
+  tipoAplicacion: 'Preemergente',
+  parcela: '',
+  parcelaIdx: '',
+  hectareas: '',
+  inventarioParcela: '',
+  ubicacion: null,
+  avanceDiarioManual: '',
+  jornaleros: '',
+  receta: [],   // {nombre, cantidad, unidad}
+  tambos: [],   // {numero, hora, plantas, ingredientes, evidencias:{preparacion,aplicacion}, ph:{valor,foto}}
+  evidenciasGenerales: [], // [{dataUrl, hora}]
+  kml: null,    // {archivo, placemark, vertices, areaHa}
+  auditor: {nombre:'Jorge López Carranza', firma:null, fecha:''},
+  observaciones: ''
+};
+
+/* ---------------- Utilidades ---------------- */
+function fmtFechaHora(d){
+  const p = n => String(n).padStart(2,'0');
+  return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function guardar(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+    const f = document.getElementById('saveFlag');
+    f.style.opacity = 1;
+  }catch(e){
+    console.error('No se pudo guardar localmente', e);
+  }
+}
+function cargar(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ estado = JSON.parse(raw); }
+  }catch(e){}
+}
+
+/* ---------------- Inicio ---------------- */
+function iniciar(){
+  cargar();
+  if(typeof esContextoSeguro === 'function' && !esContextoSeguro()){
+    document.getElementById('avisoInseguro').style.display = 'block';
+  }
+  if(!estado.fechaHora){
+    estado.fechaHora = fmtFechaHora(new Date());
+  }
+  if(!estado.receta || estado.receta.length===0){
+    estado.receta = [{nombre:'', cantidad:'', unidad:'ml'}];
+  }
+  if(!estado.evidenciasGenerales) estado.evidenciasGenerales = [];
+  if(estado.kml === undefined) estado.kml = null;
+  if(!estado.auditor) estado.auditor = {nombre:'Jorge López Carranza', firma:null, fecha:''};
+  estado.tambos.forEach(t=>{
+    if(!t.evidencias) t.evidencias = {preparacion:null, aplicacion:null};
+    if(!t.ph) t.ph = {valor:'', foto:null};
+    if(!t.phAgua) t.phAgua = {valor:'', foto:null};
+    if(t.preparadoPor === undefined) t.preparadoPor = '';
+  });
+  document.getElementById('fechaHora').value = estado.fechaHora;
+  document.getElementById('tipoAplicacion').value = estado.tipoAplicacion || 'Preemergente';
+  document.getElementById('inventarioParcela').value = estado.inventarioParcela || '';
+  document.getElementById('observaciones').value = estado.observaciones || '';
+
+  // --- Jefe de Área / Supervisor selects ---
+  poblarSelectRol(document.getElementById('jefeAreaSelect'), cargarCatalogo(KEY_CATALOGO_JEFES, DEFAULT_JEFES), estado.jefeArea);
+  poblarSelectRol(document.getElementById('supervisorSelect'), cargarCatalogo(KEY_CATALOGO_SUPERVISORES, DEFAULT_SUPERVISORES), estado.supervisor);
+
+  // --- Parcela select ---
+  const pSel = document.getElementById('parcelaSelect');
+  pSel.innerHTML = '<option value="">— Selecciona una parcela —</option>' +
+    INVENTARIO.map((p,i)=>`<option value="${i}">${p.rancho} · ${p.contrato} (${p.anio})</option>`).join('') +
+    '<option value="otra">Otra parcela (no listada)</option>';
+  if(estado.parcelaIdx !== '' && estado.parcelaIdx !== null && estado.parcelaIdx !== undefined){
+    pSel.value = String(estado.parcelaIdx);
+    mostrarInfoParcela(INVENTARIO[estado.parcelaIdx]);
+  } else if(estado.parcela){
+    pSel.value = 'otra';
+    document.getElementById('parcelaManual').style.display='block';
+    document.getElementById('parcelaManual').value = estado.parcela;
+  }
+
+  if(estado.ubicacion){ pintarUbicacion(estado.ubicacion); }
+
+  document.getElementById('auditorNombre').value = estado.auditor.nombre || 'Jorge López Carranza';
+  document.getElementById('auditorNombre').addEventListener('input', e=>{estado.auditor.nombre=e.target.value; guardar();});
+
+  pintarReceta();
+  pintarTambos();
+  pintarGaleriaGeneral();
+  pintarKmlInfo();
+  initFirma();
+  actualizarResumen();
+
+  // listeners
+  document.getElementById('tipoAplicacion').addEventListener('change', e=>{estado.tipoAplicacion=e.target.value; guardar();});
+  document.getElementById('inventarioParcela').addEventListener('input', e=>{estado.inventarioParcela=e.target.value; actualizarResumen(); guardar();});
+  document.getElementById('observaciones').addEventListener('input', e=>{estado.observaciones=e.target.value; guardar();});
+  document.getElementById('jornalerosReq').value = estado.jornaleros || '';
+  if(estado.avanceDiarioManual !== ''){ document.getElementById('avanceDiario').value = estado.avanceDiarioManual; }
+  document.getElementById('avanceDiario').addEventListener('input', e=>{estado.avanceDiarioManual=e.target.value; actualizarResumen(); guardar();});
+  document.getElementById('jornalerosReq').addEventListener('input', e=>{estado.jornaleros=e.target.value; actualizarResumen(); guardar();});
+  document.getElementById('parcelaManual').addEventListener('input', e=>{estado.parcela=e.target.value; guardar();});
+}
+
+function onTipoChange(v){
+  estado.tipoAplicacion = v;
+  guardar();
+}
+
+/* --- Catálogos de personal (Jefe de Área / Supervisor) --- */
+function poblarSelectRol(selectEl, catalogo, actual){
+  selectEl.innerHTML = '<option value="">— Selecciona —</option>' +
+    catalogo.map(n=>`<option value="${n}">${n}</option>`).join('') +
+    '<option value="__nuevo__">+ Agregar nuevo nombre…</option>';
+  if(actual && catalogo.includes(actual)) selectEl.value = actual;
+}
+
+function onJefeAreaChange(v){
+  const selectEl = document.getElementById('jefeAreaSelect');
+  if(v === '__nuevo__'){
+    const nombre = (prompt('Nombre completo del Jefe de Área:') || '').trim();
+    const catalogo = cargarCatalogo(KEY_CATALOGO_JEFES, DEFAULT_JEFES);
+    if(nombre){
+      if(!catalogo.includes(nombre)){ catalogo.push(nombre); guardarCatalogo(KEY_CATALOGO_JEFES, catalogo); }
+      estado.jefeArea = nombre;
+    }else{
+      estado.jefeArea = '';
+    }
+    poblarSelectRol(selectEl, catalogo, estado.jefeArea);
+  }else{
+    estado.jefeArea = v;
+  }
+  guardar();
+}
+
+function onSupervisorChange(v){
+  const selectEl = document.getElementById('supervisorSelect');
+  if(v === '__nuevo__'){
+    const nombre = (prompt('Nombre completo del Supervisor:') || '').trim();
+    const catalogo = cargarCatalogo(KEY_CATALOGO_SUPERVISORES, DEFAULT_SUPERVISORES);
+    if(nombre){
+      if(!catalogo.includes(nombre)){ catalogo.push(nombre); guardarCatalogo(KEY_CATALOGO_SUPERVISORES, catalogo); }
+      estado.supervisor = nombre;
+    }else{
+      estado.supervisor = '';
+    }
+    poblarSelectRol(selectEl, catalogo, estado.supervisor);
+  }else{
+    estado.supervisor = v;
+  }
+  guardar();
+}
+
+function onParcelaChange(v){
+  const manual = document.getElementById('parcelaManual');
+  if(v === 'otra'){
+    manual.style.display='block';
+    manual.focus();
+    estado.parcela = manual.value || '';
+    estado.parcelaIdx = '';
+    estado.hectareas = '';
+    document.getElementById('parcelaInfoHint').textContent = 'Captura manualmente el inventario de plantas de esta parcela.';
+  }else if(v === ''){
+    manual.style.display='none';
+    estado.parcela=''; estado.parcelaIdx=''; estado.hectareas='';
+    document.getElementById('parcelaInfoHint').textContent = 'Selecciona una parcela del catálogo para autocompletar el inventario y las hectáreas.';
+  }else{
+    manual.style.display='none';
+    const item = INVENTARIO[parseInt(v)];
+    estado.parcelaIdx = v;
+    estado.parcela = item.rancho + ' · ' + item.contrato;
+    estado.hectareas = item.has;
+    estado.inventarioParcela = item.inventario;
+    document.getElementById('inventarioParcela').value = item.inventario;
+    mostrarInfoParcela(item);
+  }
+  actualizarResumen();
+  guardar();
+}
+function mostrarInfoParcela(item){
+  document.getElementById('parcelaInfoHint').textContent =
+    `Rancho ${item.rancho} · Contrato ${item.contrato} (${item.anio}) · ${item.has} ha · Inventario de catálogo: ${item.inventario.toLocaleString('es-MX')} plantas. Puedes ajustar el número si el inventario actual cambió.`;
+}
+
+/* ---------------- Receta predefinida ---------------- */
+function cargarRecetaPreset(key){
+  if(!key){ return; }
+  const preset = RECETAS_PRESET[key];
+  if(!preset) return;
+  if(confirm('Esto reemplaza los insumos actuales de la receta con la plantilla "'+preset.label+'". ¿Continuar?')){
+    estado.receta = preset.ingredientes.map(i=>({...i}));
+    pintarReceta();
+    guardar();
+  }
+  document.getElementById('recetaPreset').value='';
+}
+
+/* ---------------- Ubicación ---------------- */
+function esContextoSeguro(){
+  return window.isSecureContext === true; // https, localhost o algunos file:// según navegador
+}
+function capturarUbicacion(){
+  const box = document.getElementById('geoBox');
+  const txt = document.getElementById('geoTxt');
+  const sub = document.getElementById('geoSub');
+
+  if(!navigator.geolocation){
+    box.className='geo-box err';
+    txt.textContent='Este navegador no soporta GPS';
+    sub.textContent='Usa "Escribir coordenadas a mano" para capturarla manualmente.';
+    mostrarUbicacionManual();
+    return;
+  }
+  if(!esContextoSeguro()){
+    box.className='geo-box err';
+    txt.textContent='El GPS no funciona en esta vista (requiere una dirección segura https://)';
+    sub.textContent='Usa "Escribir coordenadas a mano" mientras tanto.';
+    mostrarUbicacionManual();
+    return;
+  }
+  txt.textContent = 'Obteniendo ubicación…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const u = {
+      lat: pos.coords.latitude.toFixed(6),
+      lon: pos.coords.longitude.toFixed(6),
+      precision: Math.round(pos.coords.accuracy),
+      hora: fmtFechaHora(new Date()),
+      manual: false
+    };
+    estado.ubicacion = u;
+    pintarUbicacion(u);
+    guardar();
+  }, err=>{
+    box.className='geo-box err';
+    txt.textContent='No se pudo obtener la ubicación por GPS';
+    sub.textContent = (err.message || 'Verifica el permiso de GPS') + ' · Usa "Escribir coordenadas a mano" como respaldo.';
+    mostrarUbicacionManual();
+  }, {enableHighAccuracy:true, timeout:15000});
+}
+function pintarUbicacion(u){
+  const box = document.getElementById('geoBox');
+  box.className='geo-box ok';
+  document.getElementById('geoTxt').textContent = `${u.lat}, ${u.lon}`;
+  document.getElementById('geoSub').textContent = u.manual
+    ? `Capturada a mano · ${u.hora}`
+    : `Precisión ±${u.precision} m · capturada ${u.hora}`;
+}
+function mostrarUbicacionManual(){
+  document.getElementById('ubicacionManualBox').style.display = 'block';
+  if(estado.ubicacion && estado.ubicacion.manual){
+    document.getElementById('latManual').value = estado.ubicacion.lat;
+    document.getElementById('lonManual').value = estado.ubicacion.lon;
+  }
+}
+function usarUbicacionManual(){
+  const lat = document.getElementById('latManual').value.trim();
+  const lon = document.getElementById('lonManual').value.trim();
+  if(lat==='' || lon==='' || isNaN(parseFloat(lat)) || isNaN(parseFloat(lon))){
+    alert('Escribe una latitud y longitud válidas (ejemplo: 20.912 y -103.442).');
+    return;
+  }
+  const u = {
+    lat: parseFloat(lat).toFixed(6),
+    lon: parseFloat(lon).toFixed(6),
+    precision: null,
+    hora: fmtFechaHora(new Date()),
+    manual: true
+  };
+  estado.ubicacion = u;
+  pintarUbicacion(u);
+  guardar();
+}
+
+/* ---------------- Receta base ---------------- */
+function pintarReceta(){
+  const cont = document.getElementById('recetaRows');
+  cont.innerHTML = '';
+  estado.receta.forEach((ing, i)=>{
+    const row = document.createElement('div');
+    row.className='ing-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Insumo (ej. Glifosato)" value="${ing.nombre||''}" oninput="recetaCambio(${i},'nombre',this.value)">
+      <input type="number" placeholder="Cantidad" value="${ing.cantidad||''}" oninput="recetaCambio(${i},'cantidad',this.value)" min="0">
+      <select onchange="recetaCambio(${i},'unidad',this.value)">
+        ${['ml','l','g','kg'].map(u=>`<option value="${u}" ${ing.unidad===u?'selected':''}>${u}</option>`).join('')}
+      </select>
+      <button class="del" onclick="quitarInsumoReceta(${i})">✕</button>
+    `;
+    cont.appendChild(row);
+  });
+}
+function agregarInsumoReceta(){
+  estado.receta.push({nombre:'', cantidad:'', unidad:'ml'});
+  pintarReceta(); guardar();
+}
+function quitarInsumoReceta(i){
+  estado.receta.splice(i,1);
+  if(estado.receta.length===0) estado.receta.push({nombre:'', cantidad:'', unidad:'ml'});
+  pintarReceta(); guardar();
+}
+function recetaCambio(i, campo, valor){
+  estado.receta[i][campo] = valor;
+  guardar();
+}
+
+/* ---------------- Tambos ---------------- */
+function abrirNuevoTambo(){
+  const numero = estado.tambos.length + 1;
+  const ingredientes = estado.receta
+    .filter(i=>i.nombre && i.nombre.trim()!=='')
+    .map(i=>({nombre:i.nombre, cantidad:i.cantidad, unidad:i.unidad}));
+
+  if(ingredientes.length===0){
+    alert('Primero completa al menos un insumo en la receta del tambo (sección 2).');
+    return;
+  }
+
+  const ultimoPreparador = (()=>{ try{ return localStorage.getItem('agave_ultimo_preparador') || ''; }catch(e){ return ''; } })();
+
+  estado.tambos.push({
+    numero,
+    hora: fmtFechaHora(new Date()),
+    plantas: '',
+    preparadoPor: ultimoPreparador,
+    ingredientes,
+    evidencias: {preparacion: null, aplicacion: null},
+    ph: {valor: '', foto: null},
+    phAgua: {valor: '', foto: null}
+  });
+  pintarTambos();
+  actualizarResumen();
+  guardar();
+}
+function quitarTambo(idx){
+  estado.tambos.splice(idx,1);
+  estado.tambos.forEach((t,i)=>t.numero=i+1);
+  pintarTambos();
+  actualizarResumen();
+  guardar();
+}
+function tamboCambioPlantas(idx, valor){
+  estado.tambos[idx].plantas = valor;
+  actualizarResumen();
+  guardar();
+}
+function tamboCambioIngrediente(idx, ingIdx, valor){
+  estado.tambos[idx].ingredientes[ingIdx].cantidad = valor;
+  actualizarResumen();
+  guardar();
+}
+
+function horaSoloHM(fullStr){
+  if(!fullStr) return '';
+  const parts = fullStr.split(' ');
+  return parts.length>1 ? parts[1] : '';
+}
+function tamboCambioHora(idx, valorHM){
+  const t = estado.tambos[idx];
+  const partes = (t.hora||'').split(' ');
+  const fecha = partes[0] || (estado.fechaHora||'').split(' ')[0] || fmtFechaHora(new Date()).split(' ')[0];
+  t.hora = fecha + ' ' + valorHM;
+  guardar();
+}
+
+function tamboCambioPreparador(idx, valor){
+  estado.tambos[idx].preparadoPor = valor;
+  try{ localStorage.setItem('agave_ultimo_preparador', valor); }catch(e){}
+  guardar();
+}
+
+function tamboCambioPh(idx, valor){
+  estado.tambos[idx].ph.valor = valor;
+  actualizarResumen();
+  guardar();
+}
+function tamboCambioPhAgua(idx, valor){
+  estado.tambos[idx].phAgua.valor = valor;
+  actualizarResumen();
+  guardar();
+}
+
+/* Comprime la foto en el navegador antes de guardarla (evita llenar el almacenamiento local) */
+function compressImage(file, cb){
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const maxW = 900;
+      let w = img.width, h = img.height;
+      if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.6));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function onFotoInput(idx, tipo, inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  compressImage(file, dataUrl=>{
+    if(tipo==='ph'){ estado.tambos[idx].ph.foto = dataUrl; }
+    else if(tipo==='phAgua'){ estado.tambos[idx].phAgua.foto = dataUrl; }
+    else{ estado.tambos[idx].evidencias[tipo] = dataUrl; }
+    pintarTambos();
+    actualizarResumen();
+    guardar();
+  });
+  inputEl.value = '';
+}
+
+function quitarFoto(idx, tipo){
+  if(tipo==='ph'){ estado.tambos[idx].ph.foto = null; }
+  else if(tipo==='phAgua'){ estado.tambos[idx].phAgua.foto = null; }
+  else{ estado.tambos[idx].evidencias[tipo] = null; }
+  pintarTambos();
+  actualizarResumen();
+  guardar();
+}
+
+/* Genera el bloque HTML de un slot de foto (con o sin imagen ya capturada) */
+function fotoSlot(idx, tipo, etiqueta, dataUrl, numero){
+  const inputId = `foto_${idx}_${tipo}`;
+  if(dataUrl){
+    return `
+      <div class="foto-slot">
+        <div class="lbl"><span>${etiqueta}</span><span class="badge">Tambo #${numero}</span></div>
+        <div class="foto-thumb-wrap">
+          <img src="${dataUrl}" alt="${etiqueta} - tambo ${numero}">
+          <div class="foto-thumb-actions">
+            <label class="btn btn-ghost btn-sm" style="flex:1;">
+              Reemplazar
+              <input type="file" id="${inputId}" accept="image/*" capture="environment" style="display:none;" onchange="onFotoInput(${idx}, '${tipo}', this)">
+            </label>
+            <button class="btn btn-danger btn-sm" onclick="quitarFoto(${idx}, '${tipo}')" type="button">Quitar</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="foto-slot">
+      <div class="lbl"><span>${etiqueta}</span><span class="badge">Tambo #${numero}</span></div>
+      <label class="foto-capture-btn" for="${inputId}">
+        📷 Tomar foto
+        <input type="file" id="${inputId}" accept="image/*" capture="environment" style="display:none;" onchange="onFotoInput(${idx}, '${tipo}', this)">
+      </label>
+    </div>`;
+}
+
+function pintarTambos(){
+  const cont = document.getElementById('tambosLista');
+  const empty = document.getElementById('tambosEmpty');
+  cont.innerHTML = '';
+  if(estado.tambos.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  estado.tambos.forEach((t, idx)=>{
+    const card = document.createElement('div');
+    card.className='tambo-card';
+    card.innerHTML = `
+      <div class="head">
+        <span>Tambo #${t.numero} · 200 L</span>
+        <button class="del" onclick="quitarTambo(${idx})">✕</button>
+      </div>
+      <div class="meta">Preparado a las:
+        <input type="time" value="${horaSoloHM(t.hora)}" style="width:auto;display:inline-block;padding:4px 6px;font-size:13px;margin-left:4px;" oninput="tamboCambioHora(${idx}, this.value)">
+      </div>
+      <label style="margin:6px 0 2px;">Preparado por</label>
+      <input type="text" placeholder="Nombre de quien preparó el tambo" value="${t.preparadoPor||''}" oninput="tamboCambioPreparador(${idx}, this.value)">
+
+      <label style="margin:10px 0 2px;">Ingredientes usados</label>
+      ${t.ingredientes.map((ing,i)=>`
+        <div class="ing-row" style="grid-template-columns:1.5fr 0.8fr 0.7fr;">
+          <input type="text" value="${ing.nombre}" disabled>
+          <input type="number" value="${ing.cantidad}" oninput="tamboCambioIngrediente(${idx},${i},this.value)">
+          <input type="text" value="${ing.unidad}" disabled>
+        </div>
+      `).join('')}
+
+      <div class="evid-block">
+        <label style="margin-bottom:2px;">Evidencias · Tambo #${t.numero}</label>
+        ${fotoSlot(idx, 'preparacion', 'Preparación de la mezcla', t.evidencias.preparacion, t.numero)}
+        ${fotoSlot(idx, 'aplicacion', 'Aplicación en surco de agave', t.evidencias.aplicacion, t.numero)}
+        <div class="ph-slot">
+          <div class="ph-slot-head">
+            <span>pH del agua · Tambo #${t.numero}</span>
+          </div>
+          <input type="number" step="0.01" min="0" max="14" placeholder="Valor de pH del agua (ej. 7.2)" value="${t.phAgua ? t.phAgua.valor : ''}" oninput="tamboCambioPhAgua(${idx}, this.value)" style="margin-bottom:6px;">
+          ${fotoSlot(idx, 'phAgua', 'Foto del potenciómetro (agua)', t.phAgua ? t.phAgua.foto : null, t.numero)}
+        </div>
+        <div class="ph-slot">
+          <div class="ph-slot-head">
+            <span>pH de la preparación · Tambo #${t.numero}</span>
+          </div>
+          <input type="number" step="0.01" min="0" max="14" placeholder="Valor de pH (ej. 5.4)" value="${t.ph.valor}" oninput="tamboCambioPh(${idx}, this.value)" style="margin-bottom:6px;">
+          ${fotoSlot(idx, 'ph', 'Foto del potenciómetro', t.ph.foto, t.numero)}
+        </div>
+      </div>
+    `;
+    cont.appendChild(card);
+  });
+}
+
+/* ---------------- Resumen ---------------- */
+function actualizarResumen(){
+  const totalTambos = estado.tambos.length;
+  const aguaTotal = totalTambos * 200;
+  const inventario = parseFloat(estado.inventarioParcela) || 0;
+  const avanceDiario = parseFloat(estado.avanceDiarioManual) || 0;
+  const restante = Math.max(inventario - avanceDiario, 0);
+  const pct = inventario>0 ? Math.min(100, Math.round((avanceDiario/inventario)*100)) : 0;
+
+  document.getElementById('sumTambos').textContent = totalTambos;
+  document.getElementById('sumAgua').textContent = aguaTotal.toLocaleString('es-MX') + ' L';
+  document.getElementById('sumAvance').textContent = avanceDiario.toLocaleString('es-MX');
+  document.getElementById('sumRestante').textContent = inventario>0 ? restante.toLocaleString('es-MX') : '—';
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = inventario>0
+    ? `${pct}% del inventario de la parcela tratado (${avanceDiario.toLocaleString('es-MX')} de ${inventario.toLocaleString('es-MX')} plantas)`
+    : 'Captura el inventario de la parcela para calcular el % de avance';
+
+  // evidencias fotográficas y pH
+  let totalFotos = 0;
+  let sumaPh = 0, cuentaPh = 0;
+  let sumaPhAgua = 0, cuentaPhAgua = 0;
+  estado.tambos.forEach(t=>{
+    if(t.evidencias.preparacion) totalFotos++;
+    if(t.evidencias.aplicacion) totalFotos++;
+    if(t.ph.foto) totalFotos++;
+    if(t.phAgua && t.phAgua.foto) totalFotos++;
+    if(t.ph.valor !== '' && t.ph.valor !== null && !isNaN(parseFloat(t.ph.valor))){
+      sumaPh += parseFloat(t.ph.valor);
+      cuentaPh++;
+    }
+    if(t.phAgua && t.phAgua.valor !== '' && t.phAgua.valor !== null && !isNaN(parseFloat(t.phAgua.valor))){
+      sumaPhAgua += parseFloat(t.phAgua.valor);
+      cuentaPhAgua++;
+    }
+  });
+  document.getElementById('sumEvidencias').textContent = totalFotos + estado.evidenciasGenerales.length;
+  document.getElementById('sumPhProm').textContent = cuentaPh>0 ? (sumaPh/cuentaPh).toFixed(2) : '—';
+  document.getElementById('sumPhAguaProm').textContent = cuentaPhAgua>0 ? (sumaPhAgua/cuentaPhAgua).toFixed(2) : '—';
+
+  // avance diario y jornaleros (sección 6, captura manual)
+  document.getElementById('avanceFaltante').textContent = inventario>0 ? restante.toLocaleString('es-MX') : '—';
+  const jornaleros = parseFloat(estado.jornaleros) || 0;
+  document.getElementById('avanceRendimiento').textContent = (jornaleros>0 && avanceDiario>0)
+    ? Math.round(avanceDiario/jornaleros).toLocaleString('es-MX')
+    : '—';
+
+  // consumo por insumo
+  const consumo = {};
+  estado.tambos.forEach(t=>{
+    t.ingredientes.forEach(ing=>{
+      if(!ing.nombre) return;
+      const key = ing.nombre.trim()+' ('+ing.unidad+')';
+      consumo[key] = (consumo[key]||0) + (parseFloat(ing.cantidad)||0);
+    });
+  });
+  const tbody = document.getElementById('tablaInsumos');
+  tbody.innerHTML = '';
+  const keys = Object.keys(consumo);
+  if(keys.length===0){
+    tbody.innerHTML = '<tr><td colspan="2" style="color:#8a978c;">Sin tambos registrados aún</td></tr>';
+  }else{
+    keys.forEach(k=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${k.replace(/\s\([a-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${k.match(/\(([a-z]+)\)$/)[1]}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+/* ---------------- Exportar ---------------- */
+function exportarJSON(){
+  const data = JSON.stringify(estado, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = estado.fechaHora.replace(/[\/: ]/g,'-');
+  a.href = url;
+  a.download = `reporte_aplicacion_${(estado.parcela||'parcela').replace(/\s+/g,'_')}_${fecha}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------- Nueva jornada ---------------- */
+function nuevaJornada(){
+  if(!confirm('¿Cerrar esta jornada y comenzar una nueva captura? Se guardará una copia en el historial y podrás consultarla y generar su PDF cuando quieras.')) return;
+  archivarJornadaActual();
+  localStorage.removeItem(STORAGE_KEY);
+  estado = {
+    fechaHora:'', jefeArea:'', supervisor:'', tipoAplicacion:'Preemergente', parcela:'',
+    parcelaIdx:'', hectareas:'', inventarioParcela:'', ubicacion:null,
+    avanceDiarioManual:'', jornaleros:'',
+    receta:[], tambos:[], evidenciasGenerales:[], kml:null,
+    auditor:{nombre:'Jorge López Carranza', firma:null, fecha:''},
+    observaciones:''
+  };
+  iniciar();
+}
+
+/* ---------------- Historial (base de datos local de jornadas) ---------------- */
+const KEY_HISTORIAL = 'agave_historial_jornadas';
+
+function cargarHistorial(){
+  try{
+    const raw = localStorage.getItem(KEY_HISTORIAL);
+    if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr)) return arr; }
+  }catch(e){}
+  return [];
+}
+function guardarHistorial(arr){
+  try{
+    localStorage.setItem(KEY_HISTORIAL, JSON.stringify(arr));
+    return true;
+  }catch(e){
+    alert('No se pudo guardar en el historial (posiblemente el almacenamiento del dispositivo está lleno de fotos). Exporta y respalda tus reportes seguido, y borra jornadas viejas del historial si es necesario.');
+    return false;
+  }
+}
+function archivarJornadaActual(){
+  const tieneContenido = (estado.parcela && estado.parcela.trim()!=='') || estado.tambos.length>0;
+  if(!tieneContenido) return;
+  const historial = cargarHistorial();
+  const copia = JSON.parse(JSON.stringify(estado));
+  copia._id = 'jornada_' + Date.now();
+  copia._archivadoEn = fmtFechaHora(new Date());
+  historial.push(copia);
+  guardarHistorial(historial);
+}
+
+function abrirHistorial(){
+  const historial = cargarHistorial();
+  const filtro = document.getElementById('historialFiltroParcela');
+  const parcelas = Array.from(new Set(historial.map(r=>r.parcela).filter(Boolean))).sort();
+  filtro.innerHTML = '<option value="">Todas las parcelas</option>' + parcelas.map(p=>`<option value="${p}">${p}</option>`).join('');
+  pintarHistorial();
+  document.getElementById('historialOverlay').style.display = 'block';
+}
+function cerrarHistorial(){
+  document.getElementById('historialOverlay').style.display = 'none';
+}
+function pintarHistorial(){
+  const historial = cargarHistorial().slice().reverse(); // más reciente primero
+  const filtroVal = document.getElementById('historialFiltroParcela').value;
+  const filtrado = filtroVal ? historial.filter(r=>r.parcela===filtroVal) : historial;
+  const cont = document.getElementById('historialLista');
+  if(filtrado.length===0){
+    cont.innerHTML = '<p class="empty">No hay jornadas guardadas en el historial todavía.</p>';
+    return;
+  }
+  cont.innerHTML = filtrado.map(r=>{
+    const totalFotos = contarFotosRegistro(r);
+    return `
+      <div class="historial-item">
+        <div class="top"><span>${r.parcela || 'Sin parcela'}</span><span>${r.fechaHora || ''}</span></div>
+        <div class="sub">Jefe de Área: ${r.jefeArea||'—'} · Supervisor: ${r.supervisor||'—'} · ${r.tambos.length} tambos · ${totalFotos} fotos</div>
+        <button class="btn btn-primary btn-sm btn-block" onclick="verDetalleRegistro('${r._id}')" type="button">Ver detalle y generar PDF</button>
+      </div>`;
+  }).join('');
+}
+function contarFotosRegistro(r){
+  let n = 0;
+  (r.tambos||[]).forEach(t=>{
+    if(t.evidencias){ if(t.evidencias.preparacion) n++; if(t.evidencias.aplicacion) n++; }
+    if(t.ph && t.ph.foto) n++;
+    if(t.phAgua && t.phAgua.foto) n++;
+  });
+  n += (r.evidenciasGenerales||[]).length;
+  return n;
+}
+
+let _registroDetalleActual = null;
+function verDetalleRegistro(id){
+  const historial = cargarHistorial();
+  const reg = historial.find(r=>r._id === id);
+  if(!reg) return;
+  _registroDetalleActual = reg;
+  document.getElementById('detalleContenido').innerHTML = renderDetalleLectura(reg);
+  document.getElementById('detalleOverlay').style.display = 'block';
+}
+function cerrarDetalle(){
+  document.getElementById('detalleOverlay').style.display = 'none';
+  _registroDetalleActual = null;
+}
+function generarPdfDesdeDetalle(){
+  if(_registroDetalleActual) generarPdfRegistro(_registroDetalleActual);
+}
+
+// calcula consumo total por insumo a partir de un arreglo de tambos
+function calcularConsumoInsumos(tambos){
+  const consumo = {};
+  (tambos||[]).forEach(t=>{
+    (t.ingredientes||[]).forEach(ing=>{
+      if(!ing.nombre) return;
+      const key = ing.nombre.trim()+' ('+ing.unidad+')';
+      consumo[key] = (consumo[key]||0) + (parseFloat(ing.cantidad)||0);
+    });
+  });
+  return consumo;
+}
+
+// vista de solo lectura para el modal de detalle (compacta, con miniaturas)
+function renderDetalleLectura(r){
+  const consumo = calcularConsumoInsumos(r.tambos);
+  const avance = (r.avanceDiarioManual !== undefined && r.avanceDiarioManual !== '' && r.avanceDiarioManual !== null) ? (parseFloat(r.avanceDiarioManual)||0) : (r.tambos||[]).reduce((s,t)=> s+(parseFloat(t.plantas)||0), 0);
+  const inventario = parseFloat(r.inventarioParcela)||0;
+  const faltante = Math.max(inventario-avance, 0);
+  let html = '';
+
+  html += `<div class="detalle-section"><h3>Datos generales</h3><table>
+    <tr><td><b>Fecha/hora</b></td><td>${r.fechaHora||'—'}</td></tr>
+    <tr><td><b>Parcela</b></td><td>${r.parcela||'—'}</td></tr>
+    <tr><td><b>Jefe de Área</b></td><td>${r.jefeArea||'—'}</td></tr>
+    <tr><td><b>Supervisor</b></td><td>${r.supervisor||'—'}</td></tr>
+    <tr><td><b>Tipo de aplicación</b></td><td>${r.tipoAplicacion||'—'}</td></tr>
+    <tr><td><b>Hectáreas</b></td><td>${r.hectareas||'—'}</td></tr>
+    <tr><td><b>Inventario parcela</b></td><td>${inventario ? inventario.toLocaleString('es-MX') : '—'}</td></tr>
+    <tr><td><b>Ubicación</b></td><td>${r.ubicacion ? (r.ubicacion.lat+', '+r.ubicacion.lon) : '—'}</td></tr>
+  </table></div>`;
+
+  html += `<div class="detalle-section"><h3>Tambos aplicados (${(r.tambos||[]).length})</h3>`;
+  (r.tambos||[]).forEach(t=>{
+    html += `<p style="font-size:13px;margin:6px 0 2px;"><b>Tambo #${t.numero}</b> · ${t.hora||''} · Preparado por: ${t.preparadoPor||'—'} · Plantas: ${t.plantas||0}</p>`;
+    html += `<table>` + (t.ingredientes||[]).map(ing=>`<tr><td>${ing.nombre}</td><td class="num">${ing.cantidad} ${ing.unidad}</td></tr>`).join('') + `</table>`;
+    const fotos = [];
+    if(t.evidencias && t.evidencias.preparacion) fotos.push([t.evidencias.preparacion,'Preparación']);
+    if(t.evidencias && t.evidencias.aplicacion) fotos.push([t.evidencias.aplicacion,'Aplicación']);
+    if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'pH mezcla '+(t.ph.valor||'')]);
+    if(t.phAgua && t.phAgua.foto) fotos.push([t.phAgua.foto, 'pH agua '+(t.phAgua.valor||'')]);
+    if(fotos.length){
+      html += `<div class="detalle-fotos">` + fotos.map(f=>`<div><img src="${f[0]}"><div class="cap">${f[1]}</div></div>`).join('') + `</div>`;
+    }
+  });
+  html += `</div>`;
+
+  html += `<div class="detalle-section"><h3>Consumo de insumos</h3><table>` +
+    Object.keys(consumo).map(k=>`<tr><td>${k.replace(/\s\([a-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([a-z]+)\)$/)||['','' ])[1]}</td></tr>`).join('') +
+    `</table></div>`;
+
+  html += `<div class="detalle-section"><h3>Avance y jornaleros</h3><table>
+    <tr><td>Avance en plantas</td><td class="num">${avance.toLocaleString('es-MX')}</td></tr>
+    <tr><td>Faltante por aplicar</td><td class="num">${inventario ? faltante.toLocaleString('es-MX') : '—'}</td></tr>
+    <tr><td>Jornaleros requeridos</td><td class="num">${r.jornaleros||'—'}</td></tr>
+  </table></div>`;
+
+  if((r.evidenciasGenerales||[]).length){
+    html += `<div class="detalle-section"><h3>Evidencias generales</h3><div class="detalle-fotos">` +
+      r.evidenciasGenerales.map((ev,i)=>`<div><img src="${ev.dataUrl}"><div class="cap">Evidencia #${i+1}</div></div>`).join('') + `</div></div>`;
+  }
+
+  if(r.kml){
+    html += `<div class="detalle-section"><h3>Polígono KML</h3><p style="font-size:13px;">${r.kml.placemark||r.kml.archivo}${r.kml.areaHa? ' · ≈'+r.kml.areaHa.toFixed(2)+' ha':''}</p></div>`;
+  }
+
+  html += `<div class="detalle-section"><h3>Observaciones</h3><p style="font-size:13px;">${r.observaciones||'—'}</p></div>`;
+
+  html += `<div class="detalle-section"><h3>Auditor</h3><p style="font-size:13px;">${r.auditor ? r.auditor.nombre : '—'} ${r.auditor && r.auditor.firma ? '· Firmado el '+r.auditor.fecha : '· Sin firmar'}</p>
+    ${r.auditor && r.auditor.firma ? `<img src="${r.auditor.firma}" style="max-width:220px;border:1px solid #ddd;border-radius:6px;">` : ''}</div>`;
+
+  return html;
+}
+
+/* ---------------- Generación de PDF (documento imprimible independiente) ---------------- */
+function generarPdfRegistro(r){
+  const consumo = calcularConsumoInsumos(r.tambos);
+  const avance = (r.avanceDiarioManual !== undefined && r.avanceDiarioManual !== '' && r.avanceDiarioManual !== null) ? (parseFloat(r.avanceDiarioManual)||0) : (r.tambos||[]).reduce((s,t)=> s+(parseFloat(t.plantas)||0), 0);
+  const inventario = parseFloat(r.inventarioParcela)||0;
+  const faltante = Math.max(inventario-avance, 0);
+  const aguaTotal = (r.tambos||[]).length * 200;
+
+  let filas = '';
+  (r.tambos||[]).forEach(t=>{
+    const ings = (t.ingredientes||[]).map(i=>`${i.nombre}: ${i.cantidad} ${i.unidad}`).join('<br>');
+    filas += `<tr>
+      <td>${t.numero}</td>
+      <td>${(t.hora||'').split(' ')[1]||t.hora||''}</td>
+      <td>${t.preparadoPor||'—'}</td>
+      <td>${ings}</td>
+      <td>${t.plantas||0}</td>
+      <td>${t.ph?t.ph.valor:''}</td>
+      <td>${t.phAgua?t.phAgua.valor:''}</td>
+    </tr>`;
+  });
+
+  let fotosHtml = '';
+  (r.tambos||[]).forEach(t=>{
+    const fotos = [];
+    if(t.evidencias && t.evidencias.preparacion) fotos.push([t.evidencias.preparacion, 'Tambo #'+t.numero+' · Preparación']);
+    if(t.evidencias && t.evidencias.aplicacion) fotos.push([t.evidencias.aplicacion, 'Tambo #'+t.numero+' · Aplicación']);
+    if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'Tambo #'+t.numero+' · pH mezcla']);
+    if(t.phAgua && t.phAgua.foto) fotos.push([t.phAgua.foto, 'Tambo #'+t.numero+' · pH agua']);
+    fotos.forEach(f=>{
+      fotosHtml += `<div class="foto-pdf"><img src="${f[0]}"><div class="cap">${f[1]}</div></div>`;
+    });
+  });
+  (r.evidenciasGenerales||[]).forEach((ev,i)=>{
+    fotosHtml += `<div class="foto-pdf"><img src="${ev.dataUrl}"><div class="cap">Evidencia general #${i+1}</div></div>`;
+  });
+
+  const consumoHtml = Object.keys(consumo).map(k=>
+    `<tr><td>${k.replace(/\s\([a-z]+\)$/,'')}</td><td>${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([a-z]+)\)$/)||['',''])[1]}</td></tr>`
+  ).join('');
+
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  <title>Reporte de aplicación - ${r.parcela||''} - ${r.fechaHora||''}</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;color:#1E2A22;margin:24px;font-size:13px;}
+    h1{font-size:18px;margin:0 0 2px;color:#2F4A3C;}
+    h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#2F4A3C;border-bottom:1px solid #ccc;padding-bottom:3px;margin:18px 0 8px;}
+    table{width:100%;border-collapse:collapse;margin-bottom:6px;}
+    td,th{border:1px solid #ddd;padding:5px 6px;text-align:left;vertical-align:top;}
+    .datos td:first-child{font-weight:bold;width:32%;background:#F3F1E7;}
+    .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+    .stat{border:1px solid #ddd;border-radius:6px;padding:8px 12px;min-width:120px;}
+    .stat b{display:block;font-size:16px;color:#2F4A3C;}
+    .fotos{display:flex;flex-wrap:wrap;gap:8px;}
+    .foto-pdf{width:140px;}
+    .foto-pdf img{width:140px;height:105px;object-fit:cover;border:1px solid #ccc;border-radius:4px;}
+    .foto-pdf .cap{font-size:10px;text-align:center;color:#555;margin-top:2px;}
+    .firma-box{margin-top:6px;}
+    .firma-box img{max-width:220px;border:1px solid #ccc;border-radius:4px;}
+    footer{margin-top:24px;font-size:10px;color:#888;}
+    @media print{ body{margin:10mm;} }
+  </style></head><body>
+    <h1>Consolidación de Agave — Reporte de aplicación de ${(r.tipoAplicacion||'').toLowerCase()}</h1>
+    <div>${r.fechaHora||''} · Parcela: ${r.parcela||'—'}</div>
+
+    <h2>Datos generales</h2>
+    <table class="datos">
+      <tr><td>Jefe de Área</td><td>${r.jefeArea||'—'}</td></tr>
+      <tr><td>Supervisor</td><td>${r.supervisor||'—'}</td></tr>
+      <tr><td>Tipo de aplicación</td><td>${r.tipoAplicacion||'—'}</td></tr>
+      <tr><td>Hectáreas</td><td>${r.hectareas||'—'}</td></tr>
+      <tr><td>Inventario de la parcela</td><td>${inventario?inventario.toLocaleString('es-MX'):'—'}</td></tr>
+      <tr><td>Ubicación GPS</td><td>${r.ubicacion?(r.ubicacion.lat+', '+r.ubicacion.lon+' (±'+r.ubicacion.precision+'m)'):'—'}</td></tr>
+    </table>
+
+    <h2>Resumen de la jornada</h2>
+    <div class="stats">
+      <div class="stat"><b>${(r.tambos||[]).length}</b>Tambos realizados</div>
+      <div class="stat"><b>${aguaTotal.toLocaleString('es-MX')} L</b>Agua consumida</div>
+      <div class="stat"><b>${avance.toLocaleString('es-MX')}</b>Plantas tratadas</div>
+      <div class="stat"><b>${inventario?faltante.toLocaleString('es-MX'):'—'}</b>Faltante por aplicar</div>
+      <div class="stat"><b>${r.jornaleros||'—'}</b>Jornaleros requeridos</div>
+    </div>
+
+    <h2>Consumo total por insumo</h2>
+    <table><tr><th>Insumo</th><th>Consumo total</th></tr>${consumoHtml || '<tr><td colspan="2">Sin datos</td></tr>'}</table>
+
+    <h2>Detalle de tambos aplicados</h2>
+    <table>
+      <tr><th>#</th><th>Hora</th><th>Preparado por</th><th>Ingredientes</th><th>Plantas</th><th>pH mezcla</th><th>pH agua</th></tr>
+      ${filas || '<tr><td colspan="7">Sin tambos registrados</td></tr>'}
+    </table>
+
+    <h2>Evidencias fotográficas</h2>
+    <div class="fotos">${fotosHtml || '<p>Sin fotografías registradas.</p>'}</div>
+
+    ${r.kml ? `<h2>Polígono de trabajo</h2><p>${r.kml.placemark||r.kml.archivo}${r.kml.areaHa? ' · área aproximada '+r.kml.areaHa.toFixed(2)+' ha':''}</p>` : ''}
+
+    <h2>Observaciones</h2>
+    <p>${(r.observaciones||'—').replace(/\n/g,'<br>')}</p>
+
+    <h2>Validación del auditor</h2>
+    <p>${r.auditor?r.auditor.nombre:'—'} ${r.auditor && r.auditor.firma ? '— Firmado el '+r.auditor.fecha : '— Sin firmar'}</p>
+    ${r.auditor && r.auditor.firma ? `<div class="firma-box"><img src="${r.auditor.firma}"></div>` : ''}
+
+    <footer>Consolidación de Agave · Reporte generado el ${fmtFechaHora(new Date())}</footer>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  if(!win){
+    alert('Tu navegador bloqueó la ventana del PDF. Permite ventanas emergentes para este sitio e inténtalo de nuevo.');
+    return;
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  setTimeout(()=>{ win.focus(); win.print(); }, 400);
+}
+
+/* ---------------- Evidencias generales ---------------- */
+function onFotoGeneral(inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  compressImage(file, dataUrl=>{
+    estado.evidenciasGenerales.push({dataUrl, hora: fmtFechaHora(new Date())});
+    pintarGaleriaGeneral();
+    actualizarResumen();
+    guardar();
+  });
+  inputEl.value = '';
+}
+function quitarFotoGeneral(i){
+  estado.evidenciasGenerales.splice(i,1);
+  pintarGaleriaGeneral();
+  actualizarResumen();
+  guardar();
+}
+function pintarGaleriaGeneral(){
+  const cont = document.getElementById('galeriaGeneral');
+  if(!estado.evidenciasGenerales.length){ cont.innerHTML=''; return; }
+  cont.innerHTML = estado.evidenciasGenerales.map((ev,i)=>`
+    <div class="galeria-item">
+      <img src="${ev.dataUrl}" alt="Evidencia general ${i+1}">
+      <div class="cap"><span>Evidencia #${i+1} · ${ev.hora.split(' ')[1]||''}</span><button onclick="quitarFotoGeneral(${i})" type="button">✕</button></div>
+    </div>
+  `).join('');
+}
+
+/* ---------------- Polígono KML ---------------- */
+function onKmlInput(inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const texto = e.target.result;
+    let nombre = file.name, placemark = '', vertices = 0, areaHa = null;
+    try{
+      const xml = new DOMParser().parseFromString(texto, 'text/xml');
+      const nombreNode = xml.querySelector('Placemark > name') || xml.querySelector('name');
+      if(nombreNode) placemark = nombreNode.textContent.trim();
+      const coordNode = xml.querySelector('coordinates');
+      if(coordNode){
+        const pares = coordNode.textContent.trim().split(/\s+/).map(p=>p.split(',').map(Number)).filter(p=>p.length>=2 && !isNaN(p[0]) && !isNaN(p[1]));
+        vertices = pares.length;
+        if(pares.length>=3){ areaHa = areaPoligonoHa(pares); }
+      }
+    }catch(err){ console.error('No se pudo leer el KML', err); }
+    estado.kml = {archivo: nombre, contenido: texto, placemark, vertices, areaHa};
+    pintarKmlInfo();
+    guardar();
+  };
+  reader.readAsText(file);
+  inputEl.value = '';
+}
+function quitarKml(){
+  estado.kml = null;
+  pintarKmlInfo();
+  guardar();
+}
+function pintarKmlInfo(){
+  const cont = document.getElementById('kmlInfo');
+  if(!estado.kml){ cont.innerHTML=''; return; }
+  const k = estado.kml;
+  cont.innerHTML = `
+    <div class="kml-card">
+      <b>${k.placemark || k.archivo}</b>
+      Archivo: ${k.archivo}${k.vertices ? ' · '+k.vertices+' vértices' : ''}${k.areaHa ? ' · ≈ '+k.areaHa.toFixed(2)+' ha' : ''}
+      <div class="kml-remove"><button class="btn btn-danger btn-sm" onclick="quitarKml()" type="button">Quitar polígono</button></div>
+    </div>`;
+}
+// Área aproximada de un polígono lat/lon (proyección equirectangular simple), en hectáreas
+function areaPoligonoHa(pares){
+  const latRef = pares.reduce((s,p)=>s+p[1],0)/pares.length;
+  const mPerDegLat = 111320;
+  const mPerDegLon = 111320 * Math.cos(latRef * Math.PI/180);
+  const pts = pares.map(p=>[p[0]*mPerDegLon, p[1]*mPerDegLat]);
+  let area = 0;
+  for(let i=0;i<pts.length;i++){
+    const [x1,y1] = pts[i];
+    const [x2,y2] = pts[(i+1)%pts.length];
+    area += (x1*y2 - x2*y1);
+  }
+  return Math.abs(area/2) / 10000; // m² -> ha
+}
+
+/* ---------------- Firma del auditor ---------------- */
+let firmaCtx = null, firmaDibujando = false, firmaTieneTrazo = false;
+function initFirma(){
+  const canvas = document.getElementById('firmaCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = (rect.width || 600) * dpr;
+  canvas.height = 180 * dpr;
+  firmaCtx = canvas.getContext('2d');
+  firmaCtx.scale(dpr, dpr);
+  firmaCtx.lineWidth = 2.2;
+  firmaCtx.lineCap = 'round';
+  firmaCtx.strokeStyle = '#1E2A22';
+
+  if(estado.auditor.firma){
+    const img = new Image();
+    img.onload = ()=> firmaCtx.drawImage(img, 0, 0, rect.width || 600, 180);
+    img.src = estado.auditor.firma;
+    firmaTieneTrazo = true;
+    document.getElementById('firmaEstado').textContent = 'Firmado el ' + (estado.auditor.fecha || '');
+  }
+
+  function pos(evt){
+    const r = canvas.getBoundingClientRect();
+    const p = evt.touches ? evt.touches[0] : evt;
+    return {x: p.clientX - r.left, y: p.clientY - r.top};
+  }
+  function start(evt){
+    evt.preventDefault();
+    firmaDibujando = true;
+    const p = pos(evt);
+    firmaCtx.beginPath();
+    firmaCtx.moveTo(p.x, p.y);
+  }
+  function move(evt){
+    if(!firmaDibujando) return;
+    evt.preventDefault();
+    const p = pos(evt);
+    firmaCtx.lineTo(p.x, p.y);
+    firmaCtx.stroke();
+    firmaTieneTrazo = true;
+  }
+  function end(){ firmaDibujando = false; }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', end);
+}
+function limpiarFirma(){
+  const canvas = document.getElementById('firmaCanvas');
+  const rect = canvas.getBoundingClientRect();
+  firmaCtx.clearRect(0,0, rect.width||600, 180);
+  firmaTieneTrazo = false;
+  estado.auditor.firma = null;
+  estado.auditor.fecha = '';
+  document.getElementById('firmaEstado').textContent = 'Sin firmar';
+  guardar();
+}
+function guardarFirma(){
+  if(!firmaTieneTrazo){
+    alert('Dibuja la firma dentro del recuadro antes de guardarla.');
+    return;
+  }
+  const canvas = document.getElementById('firmaCanvas');
+  estado.auditor.firma = canvas.toDataURL('image/png');
+  estado.auditor.fecha = fmtFechaHora(new Date());
+  document.getElementById('firmaEstado').textContent = 'Firmado el ' + estado.auditor.fecha;
+  guardar();
+}
+
+/* ---------------- Instalar en pantalla de inicio ---------------- */
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
+function estaEnVistaPreviaEmbebida(){
+  try{ return window.self !== window.top; }catch(e){ return true; }
+}
+
+function instalarApp(){
+  if(estaEnVistaPreviaEmbebida()){
+    alert('Estás viendo la vista previa dentro del chat. Descarga el archivo .html y ábrelo directamente en Chrome o Safari de tu teléfono (no dentro de esta vista previa) — luego vuelve a intentar el botón de instalar.');
+    return;
+  }
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.finally(()=>{ deferredInstallPrompt = null; });
+    return;
+  }
+  const ua = navigator.userAgent || '';
+  const esIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const esAndroid = /Android/.test(ua);
+  const esInseguro = !esContextoSeguro();
+
+  if(esInseguro){
+    alert('Este archivo se abrió como archivo local, y por seguridad los navegadores no permiten "instalarlo" como app real desde ahí (ni tampoco usar el GPS).\n\nEsto no es un error del formulario: es una restricción del navegador.\n\nSolución rápida y gratis: sube este mismo archivo .html a https://app.netlify.com/drop (arrastrar y soltar, sin necesidad de cuenta) — te da una dirección https:// . Abre esa dirección en tu teléfono y ahí sí vas a poder instalarlo y usar el GPS normalmente.');
+    return;
+  }
+
+  let msg;
+  if(esIOS){
+    msg = 'Para instalarla en tu iPhone/iPad:\n\n1. Toca el botón Compartir (el cuadro con la flecha hacia arriba), en la barra de Safari.\n2. Elige "Agregar a pantalla de inicio".\n3. Toca "Agregar".';
+  }else if(esAndroid){
+    msg = 'Para instalarla en tu Android:\n\n1. Toca el menú (⋮) de Chrome, arriba a la derecha.\n2. Elige "Agregar a pantalla de inicio" o "Instalar aplicación".\n3. Confirma la instalación.';
+  }else{
+    msg = 'Para instalarla: abre el menú de tu navegador y busca la opción "Agregar a pantalla de inicio" o "Instalar app".';
+  }
+  alert(msg);
+}
+
+iniciar();
+</script>
+</body>
+</html>
