@@ -652,7 +652,10 @@
       <button class="btn btn-ghost btn-sm" onclick="cerrarDetalle()" type="button">Cerrar ✕</button>
     </div>
     <div id="detalleContenido"></div>
-    <button class="btn btn-ochre btn-block" style="margin-top:12px;" onclick="generarPdfDesdeDetalle()" type="button">📄 Generar PDF de este registro</button>
+    <div class="row2" style="margin-top:12px;">
+      <button class="btn btn-ghost" onclick="descargarTodasLasFotos()" type="button">⬇️ Descargar todas las fotos</button>
+      <button class="btn btn-ochre" onclick="generarPdfDesdeDetalle()" type="button">📄 Generar PDF</button>
+    </div>
   </div>
 </div>
 
@@ -874,6 +877,7 @@ function iniciar(){
   estado.tambos.forEach(t=>{
     if(!t.evidencias) t.evidencias = {preparacion:null, aplicacion:null, aguaLimpia:null};
     if(t.evidencias.aguaLimpia === undefined) t.evidencias.aguaLimpia = null;
+    if(t.capacidad === undefined || t.capacidad === null || t.capacidad === '') t.capacidad = 200;
     if(!t.ph) t.ph = {valor:'', foto:null};
     if(!t.phAgua) t.phAgua = {valor:'', foto:null};
     if(t.preparadoPor === undefined) t.preparadoPor = '';
@@ -1112,6 +1116,7 @@ function abrirNuevoTambo(){
     numero,
     hora: fmtFechaHora(new Date()),
     plantas: '',
+    capacidad: 200,
     preparadoPor: ultimoPreparador,
     ingredientes,
     evidencias: {preparacion: null, aplicacion: null, aguaLimpia: null},
@@ -1156,6 +1161,15 @@ function tamboCambioHora(idx, valorHM){
 function tamboCambioPreparador(idx, valor){
   estado.tambos[idx].preparadoPor = valor;
   try{ localStorage.setItem('agave_ultimo_preparador', valor); }catch(e){}
+  guardar();
+}
+function tamboCambioCapacidad(idx, valor){
+  let n = parseFloat(valor);
+  if(isNaN(n)) n = 0;
+  if(n > 200) n = 200;
+  if(n < 0) n = 0;
+  estado.tambos[idx].capacidad = n;
+  actualizarResumen();
   guardar();
 }
 
@@ -1216,6 +1230,7 @@ function quitarFoto(idx, tipo){
 function fotoSlot(idx, tipo, etiqueta, dataUrl, numero){
   const inputId = `foto_${idx}_${tipo}`;
   if(dataUrl){
+    const nombreArchivo = `tambo${numero}_${tipo}.jpg`;
     return `
       <div class="foto-slot">
         <div class="lbl"><span>${etiqueta}</span><span class="badge">Tambo #${numero}</span></div>
@@ -1226,6 +1241,7 @@ function fotoSlot(idx, tipo, etiqueta, dataUrl, numero){
               Reemplazar
               <input type="file" id="${inputId}" accept="image/*" capture="environment" style="display:none;" onchange="onFotoInput(${idx}, '${tipo}', this)">
             </label>
+            <button class="btn btn-ghost btn-sm" onclick="descargarFoto('${dataUrl}', '${nombreArchivo}')" type="button">⬇️</button>
             <button class="btn btn-danger btn-sm" onclick="quitarFoto(${idx}, '${tipo}')" type="button">Quitar</button>
           </div>
         </div>
@@ -1240,6 +1256,14 @@ function fotoSlot(idx, tipo, etiqueta, dataUrl, numero){
       </label>
     </div>`;
 }
+function descargarFoto(dataUrl, filename){
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = filename || 'evidencia.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 
 function pintarTambos(){
   const cont = document.getElementById('tambosLista');
@@ -1253,7 +1277,7 @@ function pintarTambos(){
     card.className='tambo-card';
     card.innerHTML = `
       <div class="head">
-        <span>Tambo #${t.numero} · 200 L</span>
+        <span>Tambo #${t.numero} · ${t.capacidad} L</span>
         <button class="del" onclick="quitarTambo(${idx})">✕</button>
       </div>
       <div class="meta">Preparado a las:
@@ -1261,6 +1285,9 @@ function pintarTambos(){
       </div>
       <label style="margin:6px 0 2px;">Preparado por</label>
       <input type="text" placeholder="Nombre de quien preparó el tambo" value="${t.preparadoPor||''}" oninput="tamboCambioPreparador(${idx}, this.value)">
+
+      <label style="margin:10px 0 2px;">Capacidad usada del tambo (litros, máx. 200)</label>
+      <input type="number" min="0" max="200" step="1" value="${t.capacidad}" oninput="tamboCambioCapacidad(${idx}, this.value)">
 
       <label style="margin:10px 0 2px;">Ingredientes usados</label>
       ${t.ingredientes.map((ing,i)=>`
@@ -1299,7 +1326,7 @@ function pintarTambos(){
 /* ---------------- Resumen ---------------- */
 function actualizarResumen(){
   const totalTambos = estado.tambos.length;
-  const aguaTotal = totalTambos * 200;
+  const aguaTotal = estado.tambos.reduce((s,t)=> s + (parseFloat(t.capacidad!==undefined?t.capacidad:200)||0), 0);
   const inventario = parseFloat(estado.inventarioParcela) || 0;
   const avanceDiario = parseFloat(estado.avanceDiarioManual) || 0;
   const restante = Math.max(inventario - avanceDiario, 0);
@@ -1485,6 +1512,23 @@ function cerrarDetalle(){
 function generarPdfDesdeDetalle(){
   if(_registroDetalleActual) generarPdfRegistro(_registroDetalleActual);
 }
+function descargarTodasLasFotos(){
+  if(!_registroDetalleActual) return;
+  const r = _registroDetalleActual;
+  const lista = [];
+  (r.tambos||[]).forEach(t=>{
+    if(t.evidencias && t.evidencias.aguaLimpia) lista.push([t.evidencias.aguaLimpia, `tambo${t.numero}_agua_limpia.jpg`]);
+    if(t.evidencias && t.evidencias.preparacion) lista.push([t.evidencias.preparacion, `tambo${t.numero}_preparacion.jpg`]);
+    if(t.evidencias && t.evidencias.aplicacion) lista.push([t.evidencias.aplicacion, `tambo${t.numero}_aplicacion.jpg`]);
+    if(t.ph && t.ph.foto) lista.push([t.ph.foto, `tambo${t.numero}_ph_mezcla.jpg`]);
+    if(t.phAgua && t.phAgua.foto) lista.push([t.phAgua.foto, `tambo${t.numero}_ph_agua.jpg`]);
+  });
+  (r.evidenciasGenerales||[]).forEach((ev,i)=> lista.push([ev.dataUrl, `evidencia_general_${i+1}.jpg`]));
+  if(lista.length===0){ alert('Este registro no tiene fotografías guardadas.'); return; }
+  lista.forEach((f,i)=>{
+    setTimeout(()=> descargarFoto(f[0], f[1]), i*350);
+  });
+}
 
 // calcula consumo total por insumo a partir de un arreglo de tambos
 function calcularConsumoInsumos(tambos){
@@ -1520,7 +1564,7 @@ function renderDetalleLectura(r){
 
   html += `<div class="detalle-section"><h3>Tambos aplicados (${(r.tambos||[]).length})</h3>`;
   (r.tambos||[]).forEach(t=>{
-    html += `<p style="font-size:13px;margin:6px 0 2px;"><b>Tambo #${t.numero}</b> · ${t.hora||''} · Preparado por: ${t.preparadoPor||'—'} · Plantas: ${t.plantas||0}</p>`;
+    html += `<p style="font-size:13px;margin:6px 0 2px;"><b>Tambo #${t.numero}</b> · ${t.hora||''} · Preparado por: ${t.preparadoPor||'—'} · Capacidad: ${t.capacidad!==undefined?t.capacidad:200} L</p>`;
     html += `<table>` + (t.ingredientes||[]).map(ing=>`<tr><td>${ing.nombre}</td><td class="num">${ing.cantidad} ${ing.unidad}</td></tr>`).join('') + `</table>`;
     const fotos = [];
     if(t.evidencias && t.evidencias.aguaLimpia) fotos.push([t.evidencias.aguaLimpia,'Agua limpia']);
@@ -1529,7 +1573,7 @@ function renderDetalleLectura(r){
     if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'pH mezcla '+(t.ph.valor||'')]);
     if(t.phAgua && t.phAgua.foto) fotos.push([t.phAgua.foto, 'pH agua '+(t.phAgua.valor||'')]);
     if(fotos.length){
-      html += `<div class="detalle-fotos">` + fotos.map(f=>`<div><img src="${f[0]}"><div class="cap">${f[1]}</div></div>`).join('') + `</div>`;
+      html += `<div class="detalle-fotos">` + fotos.map((f,i)=>`<div><img src="${f[0]}"><div class="cap">${f[1]}<br><button onclick="descargarFoto('${f[0]}','tambo${t.numero}_${i+1}.jpg')" type="button" style="border:none;background:none;color:var(--agave-dark);cursor:pointer;">⬇️ Descargar</button></div></div>`).join('') + `</div>`;
     }
   });
   html += `</div>`;
@@ -1546,11 +1590,11 @@ function renderDetalleLectura(r){
 
   if((r.evidenciasGenerales||[]).length){
     html += `<div class="detalle-section"><h3>Evidencias generales</h3><div class="detalle-fotos">` +
-      r.evidenciasGenerales.map((ev,i)=>`<div><img src="${ev.dataUrl}"><div class="cap">Evidencia #${i+1}</div></div>`).join('') + `</div></div>`;
+      r.evidenciasGenerales.map((ev,i)=>`<div><img src="${ev.dataUrl}"><div class="cap">Evidencia #${i+1}<br><button onclick="descargarFoto('${ev.dataUrl}','evidencia_general_${i+1}.jpg')" type="button" style="border:none;background:none;color:var(--agave-dark);cursor:pointer;">⬇️ Descargar</button></div></div>`).join('') + `</div></div>`;
   }
 
   if(r.kml){
-    html += `<div class="detalle-section"><h3>Polígono KML</h3><p style="font-size:13px;">${r.kml.placemark||r.kml.archivo}${r.kml.areaHa? ' · ≈'+r.kml.areaHa.toFixed(2)+' ha':''}</p></div>`;
+    html += `<div class="detalle-section"><h3>Polígono KML</h3><p style="font-size:13px;">${r.kml.placemark||r.kml.archivo}${r.kml.areaHa? ' · ≈'+r.kml.areaHa.toFixed(2)+' ha':''}</p>${construirSvgPoligono(r.kml.puntos)}</div>`;
   }
 
   html += `<div class="detalle-section"><h3>Observaciones</h3><p style="font-size:13px;">${r.observaciones||'—'}</p></div>`;
@@ -1567,7 +1611,7 @@ function generarPdfRegistro(r){
   const avance = (r.avanceDiarioManual !== undefined && r.avanceDiarioManual !== '' && r.avanceDiarioManual !== null) ? (parseFloat(r.avanceDiarioManual)||0) : (r.tambos||[]).reduce((s,t)=> s+(parseFloat(t.plantas)||0), 0);
   const inventario = parseFloat(r.inventarioParcela)||0;
   const faltante = Math.max(inventario-avance, 0);
-  const aguaTotal = (r.tambos||[]).length * 200;
+  const aguaTotal = (r.tambos||[]).reduce((s,t)=> s + (parseFloat(t.capacidad!==undefined?t.capacidad:200)||0), 0);
 
   let filas = '';
   (r.tambos||[]).forEach(t=>{
@@ -1576,8 +1620,8 @@ function generarPdfRegistro(r){
       <td>${t.numero}</td>
       <td>${(t.hora||'').split(' ')[1]||t.hora||''}</td>
       <td>${t.preparadoPor||'—'}</td>
+      <td>${t.capacidad!==undefined?t.capacidad:200} L</td>
       <td>${ings}</td>
-      <td>${t.plantas||0}</td>
       <td>${t.ph?t.ph.valor:''}</td>
       <td>${t.phAgua?t.phAgua.valor:''}</td>
     </tr>`;
@@ -1651,14 +1695,14 @@ function generarPdfRegistro(r){
 
     <h2>Detalle de tambos aplicados</h2>
     <table>
-      <tr><th>#</th><th>Hora</th><th>Preparado por</th><th>Ingredientes</th><th>Plantas</th><th>pH mezcla</th><th>pH agua</th></tr>
+      <tr><th>#</th><th>Hora</th><th>Preparado por</th><th>Capacidad</th><th>Ingredientes</th><th>pH mezcla</th><th>pH agua</th></tr>
       ${filas || '<tr><td colspan="7">Sin tambos registrados</td></tr>'}
     </table>
 
     <h2>Evidencias fotográficas</h2>
     <div class="fotos">${fotosHtml || '<p>Sin fotografías registradas.</p>'}</div>
 
-    ${r.kml ? `<h2>Polígono de trabajo</h2><p>${r.kml.placemark||r.kml.archivo}${r.kml.areaHa? ' · área aproximada '+r.kml.areaHa.toFixed(2)+' ha':''}</p>` : ''}
+    ${r.kml ? `<h2>Polígono de trabajo</h2><p>${r.kml.placemark||r.kml.archivo}${r.kml.areaHa? ' · área aproximada '+r.kml.areaHa.toFixed(2)+' ha':''}</p>${construirSvgPoligono(r.kml.puntos)}` : ''}
 
     <h2>Observaciones</h2>
     <p>${(r.observaciones||'—').replace(/\n/g,'<br>')}</p>
@@ -1705,7 +1749,12 @@ function pintarGaleriaGeneral(){
   cont.innerHTML = estado.evidenciasGenerales.map((ev,i)=>`
     <div class="galeria-item">
       <img src="${ev.dataUrl}" alt="Evidencia general ${i+1}">
-      <div class="cap"><span>Evidencia #${i+1} · ${ev.hora.split(' ')[1]||''}</span><button onclick="quitarFotoGeneral(${i})" type="button">✕</button></div>
+      <div class="cap"><span>Evidencia #${i+1} · ${ev.hora.split(' ')[1]||''}</span>
+        <span>
+          <button onclick="descargarFoto('${ev.dataUrl}', 'evidencia_general_${i+1}.jpg')" type="button" title="Descargar" style="color:var(--agave-dark);">⬇️</button>
+          <button onclick="quitarFotoGeneral(${i})" type="button" title="Quitar">✕</button>
+        </span>
+      </div>
     </div>
   `).join('');
 }
@@ -1717,7 +1766,7 @@ function onKmlInput(inputEl){
   const reader = new FileReader();
   reader.onload = function(e){
     const texto = e.target.result;
-    let nombre = file.name, placemark = '', vertices = 0, areaHa = null;
+    let nombre = file.name, placemark = '', vertices = 0, areaHa = null, puntos = [];
     try{
       const xml = new DOMParser().parseFromString(texto, 'text/xml');
       const nombreNode = xml.querySelector('Placemark > name') || xml.querySelector('name');
@@ -1726,10 +1775,11 @@ function onKmlInput(inputEl){
       if(coordNode){
         const pares = coordNode.textContent.trim().split(/\s+/).map(p=>p.split(',').map(Number)).filter(p=>p.length>=2 && !isNaN(p[0]) && !isNaN(p[1]));
         vertices = pares.length;
+        puntos = pares.map(p=>[p[0], p[1]]); // [lon, lat]
         if(pares.length>=3){ areaHa = areaPoligonoHa(pares); }
       }
     }catch(err){ console.error('No se pudo leer el KML', err); }
-    estado.kml = {archivo: nombre, contenido: texto, placemark, vertices, areaHa};
+    estado.kml = {archivo: nombre, placemark, vertices, areaHa, puntos};
     pintarKmlInfo();
     guardar();
   };
@@ -1745,10 +1795,12 @@ function pintarKmlInfo(){
   const cont = document.getElementById('kmlInfo');
   if(!estado.kml){ cont.innerHTML=''; return; }
   const k = estado.kml;
+  const svg = construirSvgPoligono(k.puntos);
   cont.innerHTML = `
     <div class="kml-card">
       <b>${k.placemark || k.archivo}</b>
       Archivo: ${k.archivo}${k.vertices ? ' · '+k.vertices+' vértices' : ''}${k.areaHa ? ' · ≈ '+k.areaHa.toFixed(2)+' ha' : ''}
+      ${svg}
       <div class="kml-remove"><button class="btn btn-danger btn-sm" onclick="quitarKml()" type="button">Quitar polígono</button></div>
     </div>`;
 }
@@ -1765,6 +1817,33 @@ function areaPoligonoHa(pares){
     area += (x1*y2 - x2*y1);
   }
   return Math.abs(area/2) / 10000; // m² -> ha
+}
+// Dibuja el polígono real del KML como SVG (proyección equirectangular simple, sin necesidad de mapas/internet)
+function construirSvgPoligono(puntos, w, h){
+  w = w || 300; h = h || 200;
+  const padding = 18;
+  if(!puntos || puntos.length < 3) return '';
+  const latRef = puntos.reduce((s,p)=>s+p[1],0)/puntos.length;
+  const mPerDegLat = 111320;
+  const mPerDegLon = 111320 * Math.cos(latRef * Math.PI/180);
+  const proy = puntos.map(p=>[p[0]*mPerDegLon, p[1]*mPerDegLat]);
+  const xs = proy.map(p=>p[0]), ys = proy.map(p=>p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const spanX = (maxX-minX) || 1, spanY = (maxY-minY) || 1;
+  const availW = w - 2*padding, availH = h - 2*padding;
+  const escala = Math.min(availW/spanX, availH/spanY);
+  const offX = padding + (availW - spanX*escala)/2;
+  const offY = padding + (availH - spanY*escala)/2;
+  const pts = proy.map(p=>{
+    const x = offX + (p[0]-minX)*escala;
+    const y = h - (offY + (p[1]-minY)*escala); // invierte Y para que el norte quede arriba
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="max-width:320px;display:block;margin:10px auto 4px;background:#fff;border:1px solid #d8d8c8;border-radius:8px;">
+    <polygon points="${pts}" fill="#7C9885" fill-opacity="0.45" stroke="#2F4A3C" stroke-width="2.2" stroke-linejoin="round"/>
+    <text x="${w-10}" y="18" font-size="12" font-weight="700" text-anchor="end" fill="#2F4A3C">N ↑</text>
+  </svg>`;
 }
 
 /* ---------------- Firma del auditor ---------------- */
