@@ -478,16 +478,6 @@
       </div>
     </div>
     <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="capturarUbicacion()">📍 Capturar ubicación (GPS)</button>
-
-    <div id="ubicacionManualBox" style="display:none;margin-top:10px;">
-      <p class="hint" style="margin-top:0;">El GPS del navegador no está disponible aquí. Captura las coordenadas manualmente (puedes copiarlas de Google Maps: mantén el dedo en tu ubicación y copia los números que aparecen).</p>
-      <div class="row2">
-        <div><label class="first">Latitud</label><input type="text" id="latManual" placeholder="Ej. 20.912"></div>
-        <div><label class="first">Longitud</label><input type="text" id="lonManual" placeholder="Ej. -103.442"></div>
-      </div>
-      <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="usarUbicacionManual()" type="button">Usar estas coordenadas</button>
-    </div>
-    <button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="mostrarUbicacionManual()" type="button">✏️ Escribir coordenadas a mano</button>
   </div>
 
   <!-- 2. RECETA POR TAMBO -->
@@ -882,7 +872,8 @@ function iniciar(){
   if(estado.kml === undefined) estado.kml = null;
   if(!estado.auditor) estado.auditor = {nombre:'Jorge López Carranza', firma:null, fecha:''};
   estado.tambos.forEach(t=>{
-    if(!t.evidencias) t.evidencias = {preparacion:null, aplicacion:null};
+    if(!t.evidencias) t.evidencias = {preparacion:null, aplicacion:null, aguaLimpia:null};
+    if(t.evidencias.aguaLimpia === undefined) t.evidencias.aguaLimpia = null;
     if(!t.ph) t.ph = {valor:'', foto:null};
     if(!t.phAgua) t.phAgua = {valor:'', foto:null};
     if(t.preparadoPor === undefined) t.preparadoPor = '';
@@ -1038,15 +1029,13 @@ function capturarUbicacion(){
   if(!navigator.geolocation){
     box.className='geo-box err';
     txt.textContent='Este navegador no soporta GPS';
-    sub.textContent='Usa "Escribir coordenadas a mano" para capturarla manualmente.';
-    mostrarUbicacionManual();
+    sub.textContent='Verifica que tu navegador tenga permisos de ubicación activados.';
     return;
   }
   if(!esContextoSeguro()){
     box.className='geo-box err';
     txt.textContent='El GPS no funciona en esta vista (requiere una dirección segura https://)';
-    sub.textContent='Usa "Escribir coordenadas a mano" mientras tanto.';
-    mostrarUbicacionManual();
+    sub.textContent='Abre el formulario desde su dirección https:// para poder usar el GPS.';
     return;
   }
   txt.textContent = 'Obteniendo ubicación…';
@@ -1055,8 +1044,7 @@ function capturarUbicacion(){
       lat: pos.coords.latitude.toFixed(6),
       lon: pos.coords.longitude.toFixed(6),
       precision: Math.round(pos.coords.accuracy),
-      hora: fmtFechaHora(new Date()),
-      manual: false
+      hora: fmtFechaHora(new Date())
     };
     estado.ubicacion = u;
     pintarUbicacion(u);
@@ -1064,42 +1052,14 @@ function capturarUbicacion(){
   }, err=>{
     box.className='geo-box err';
     txt.textContent='No se pudo obtener la ubicación por GPS';
-    sub.textContent = (err.message || 'Verifica el permiso de GPS') + ' · Usa "Escribir coordenadas a mano" como respaldo.';
-    mostrarUbicacionManual();
+    sub.textContent = err.message || 'Verifica el permiso de GPS en tu navegador.';
   }, {enableHighAccuracy:true, timeout:15000});
 }
 function pintarUbicacion(u){
   const box = document.getElementById('geoBox');
   box.className='geo-box ok';
   document.getElementById('geoTxt').textContent = `${u.lat}, ${u.lon}`;
-  document.getElementById('geoSub').textContent = u.manual
-    ? `Capturada a mano · ${u.hora}`
-    : `Precisión ±${u.precision} m · capturada ${u.hora}`;
-}
-function mostrarUbicacionManual(){
-  document.getElementById('ubicacionManualBox').style.display = 'block';
-  if(estado.ubicacion && estado.ubicacion.manual){
-    document.getElementById('latManual').value = estado.ubicacion.lat;
-    document.getElementById('lonManual').value = estado.ubicacion.lon;
-  }
-}
-function usarUbicacionManual(){
-  const lat = document.getElementById('latManual').value.trim();
-  const lon = document.getElementById('lonManual').value.trim();
-  if(lat==='' || lon==='' || isNaN(parseFloat(lat)) || isNaN(parseFloat(lon))){
-    alert('Escribe una latitud y longitud válidas (ejemplo: 20.912 y -103.442).');
-    return;
-  }
-  const u = {
-    lat: parseFloat(lat).toFixed(6),
-    lon: parseFloat(lon).toFixed(6),
-    precision: null,
-    hora: fmtFechaHora(new Date()),
-    manual: true
-  };
-  estado.ubicacion = u;
-  pintarUbicacion(u);
-  guardar();
+  document.getElementById('geoSub').textContent = `Precisión ±${u.precision} m · capturada ${u.hora}`;
 }
 
 /* ---------------- Receta base ---------------- */
@@ -1154,7 +1114,7 @@ function abrirNuevoTambo(){
     plantas: '',
     preparadoPor: ultimoPreparador,
     ingredientes,
-    evidencias: {preparacion: null, aplicacion: null},
+    evidencias: {preparacion: null, aplicacion: null, aguaLimpia: null},
     ph: {valor: '', foto: null},
     phAgua: {valor: '', foto: null}
   });
@@ -1313,6 +1273,7 @@ function pintarTambos(){
 
       <div class="evid-block">
         <label style="margin-bottom:2px;">Evidencias · Tambo #${t.numero}</label>
+        ${fotoSlot(idx, 'aguaLimpia', 'Evidencia de agua limpia (antes de preparar)', t.evidencias.aguaLimpia, t.numero)}
         ${fotoSlot(idx, 'preparacion', 'Preparación de la mezcla', t.evidencias.preparacion, t.numero)}
         ${fotoSlot(idx, 'aplicacion', 'Aplicación en surco de agave', t.evidencias.aplicacion, t.numero)}
         <div class="ph-slot">
@@ -1360,6 +1321,7 @@ function actualizarResumen(){
   estado.tambos.forEach(t=>{
     if(t.evidencias.preparacion) totalFotos++;
     if(t.evidencias.aplicacion) totalFotos++;
+    if(t.evidencias.aguaLimpia) totalFotos++;
     if(t.ph.foto) totalFotos++;
     if(t.phAgua && t.phAgua.foto) totalFotos++;
     if(t.ph.valor !== '' && t.ph.valor !== null && !isNaN(parseFloat(t.ph.valor))){
@@ -1499,7 +1461,7 @@ function pintarHistorial(){
 function contarFotosRegistro(r){
   let n = 0;
   (r.tambos||[]).forEach(t=>{
-    if(t.evidencias){ if(t.evidencias.preparacion) n++; if(t.evidencias.aplicacion) n++; }
+    if(t.evidencias){ if(t.evidencias.preparacion) n++; if(t.evidencias.aplicacion) n++; if(t.evidencias.aguaLimpia) n++; }
     if(t.ph && t.ph.foto) n++;
     if(t.phAgua && t.phAgua.foto) n++;
   });
@@ -1561,6 +1523,7 @@ function renderDetalleLectura(r){
     html += `<p style="font-size:13px;margin:6px 0 2px;"><b>Tambo #${t.numero}</b> · ${t.hora||''} · Preparado por: ${t.preparadoPor||'—'} · Plantas: ${t.plantas||0}</p>`;
     html += `<table>` + (t.ingredientes||[]).map(ing=>`<tr><td>${ing.nombre}</td><td class="num">${ing.cantidad} ${ing.unidad}</td></tr>`).join('') + `</table>`;
     const fotos = [];
+    if(t.evidencias && t.evidencias.aguaLimpia) fotos.push([t.evidencias.aguaLimpia,'Agua limpia']);
     if(t.evidencias && t.evidencias.preparacion) fotos.push([t.evidencias.preparacion,'Preparación']);
     if(t.evidencias && t.evidencias.aplicacion) fotos.push([t.evidencias.aplicacion,'Aplicación']);
     if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'pH mezcla '+(t.ph.valor||'')]);
@@ -1623,6 +1586,7 @@ function generarPdfRegistro(r){
   let fotosHtml = '';
   (r.tambos||[]).forEach(t=>{
     const fotos = [];
+    if(t.evidencias && t.evidencias.aguaLimpia) fotos.push([t.evidencias.aguaLimpia, 'Tambo #'+t.numero+' · Agua limpia']);
     if(t.evidencias && t.evidencias.preparacion) fotos.push([t.evidencias.preparacion, 'Tambo #'+t.numero+' · Preparación']);
     if(t.evidencias && t.evidencias.aplicacion) fotos.push([t.evidencias.aplicacion, 'Tambo #'+t.numero+' · Aplicación']);
     if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'Tambo #'+t.numero+' · pH mezcla']);
