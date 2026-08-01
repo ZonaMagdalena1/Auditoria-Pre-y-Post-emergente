@@ -1882,6 +1882,13 @@ function instalarApp(){
   alert(msg);
 }
 
+/* ---------------- Service worker (carga sin conexión) ---------------- */
+if('serviceWorker' in navigator && !estaEnVistaPreviaEmbebida()){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* si no está disponible, la app sigue funcionando normal en línea */ });
+  });
+}
+
 iniciar();
 </script>
 </body>
