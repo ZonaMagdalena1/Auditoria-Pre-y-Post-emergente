@@ -380,14 +380,20 @@
   .progress-bar{
     height:10px;border-radius:6px;background:var(--sage-pale);overflow:hidden;margin-top:6px;
   }
-  .progress-bar .fill{height:100%;background:var(--ochre);border-radius:6px;transition:width .3s;}
+  .progress-bar .fill{height:100%;background:var(--ochre);border-radius:6px;transition:width .3s, background-color .3s;}
+  .progress-bar .fill.sem-rojo{background:var(--danger);}
+  .progress-bar .fill.sem-amarillo{background:#D9A404;}
+  .progress-bar .fill.sem-verde{background:#2E7D46;}
 
   .actions-sticky{
     position:sticky;bottom:0;
     background:linear-gradient(to top, var(--cream) 70%, transparent);
     padding:12px 14px 8px;
-    display:flex;gap:8px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
   }
+  .actions-sticky .btn{width:100%;}
   .hint{font-size:11.5px;color:#5b6a5f;margin-top:6px;}
   .save-flag{
     font-size:11.5px;color:var(--agave);font-weight:700;
@@ -625,9 +631,10 @@
 </div>
 
 <div class="actions-sticky no-print">
-  <button class="btn btn-ghost" style="flex:1" onclick="abrirHistorial()">🗂️ Historial</button>
-  <button class="btn btn-ochre" style="flex:1" onclick="generarPdfRegistro(estado)">📄 PDF</button>
-  <button class="btn btn-danger" style="flex:none" onclick="nuevaJornada()">Nueva jornada</button>
+  <button class="btn btn-primary" onclick="guardarFormularioDelDia()">💾 Guardar</button>
+  <button class="btn btn-ghost" onclick="abrirHistorial()">🗂️ Historial</button>
+  <button class="btn btn-ochre" onclick="generarPdfRegistro(estado)">📄 PDF</button>
+  <button class="btn btn-danger" onclick="nuevaJornada()">Nueva jornada</button>
 </div>
 
 <!-- HISTORIAL DE JORNADAS -->
@@ -1346,6 +1353,13 @@ function pintarTambos(){
   });
 }
 
+// Semaforización del avance: rojo por debajo de 71%, amarillo de 71% a 99%, verde de 100% en adelante
+function semaforoAvance(pct){
+  if(pct >= 100) return {clase:'sem-verde', emoji:'🟢'};
+  if(pct >= 71) return {clase:'sem-amarillo', emoji:'🟡'};
+  return {clase:'sem-rojo', emoji:'🔴'};
+}
+
 /* ---------------- Resumen ---------------- */
 function actualizarResumen(){
   const totalTambos = estado.tambos.length;
@@ -1353,15 +1367,26 @@ function actualizarResumen(){
   const inventario = parseFloat(estado.inventarioParcela) || 0;
   const avanceDiario = parseFloat(estado.avanceDiarioManual) || 0;
   const restante = Math.max(inventario - avanceDiario, 0);
-  const pct = inventario>0 ? Math.min(100, Math.round((avanceDiario/inventario)*100)) : 0;
+  const pctReal = inventario>0 ? (avanceDiario/inventario)*100 : 0;
+  const pct = Math.round(pctReal);
+  const pctBarra = Math.max(0, Math.min(100, pct));
 
   document.getElementById('sumTambos').textContent = totalTambos;
   document.getElementById('sumAgua').textContent = aguaTotal.toLocaleString('es-MX') + ' Lt';
   document.getElementById('sumAvance').textContent = avanceDiario.toLocaleString('es-MX');
   document.getElementById('sumRestante').textContent = inventario>0 ? restante.toLocaleString('es-MX') : '—';
-  document.getElementById('progFill').style.width = pct + '%';
+
+  const progFillEl = document.getElementById('progFill');
+  progFillEl.style.width = pctBarra + '%';
+  progFillEl.classList.remove('sem-rojo','sem-amarillo','sem-verde');
+  let semEmoji = '';
+  if(inventario>0){
+    const sem = semaforoAvance(pct);
+    progFillEl.classList.add(sem.clase);
+    semEmoji = sem.emoji + ' ';
+  }
   document.getElementById('progLabel').textContent = inventario>0
-    ? `${pct}% del inventario de la parcela tratado (${avanceDiario.toLocaleString('es-MX')} de ${inventario.toLocaleString('es-MX')} plantas)`
+    ? `${semEmoji}${pct}% del inventario de la parcela tratado (${avanceDiario.toLocaleString('es-MX')} de ${inventario.toLocaleString('es-MX')} plantas)`
     : 'Captura el inventario de la parcela para calcular el % de avance';
 
   // evidencias fotográficas y pH
@@ -1469,13 +1494,27 @@ function guardarHistorial(arr){
 }
 function archivarJornadaActual(){
   const tieneContenido = (estado.parcela && estado.parcela.trim()!=='') || estado.tambos.length>0;
-  if(!tieneContenido) return;
+  if(!tieneContenido) return false;
   const historial = cargarHistorial();
   const copia = JSON.parse(JSON.stringify(estado));
   copia._id = 'jornada_' + Date.now();
   copia._archivadoEn = fmtFechaHora(new Date());
   historial.push(copia);
-  guardarHistorial(historial);
+  return guardarHistorial(historial);
+}
+
+// Botón "Guardar": archiva una copia del formulario actual en el historial,
+// sin borrar ni cerrar la jornada, para poder seguir capturando durante el día.
+function guardarFormularioDelDia(){
+  const tieneContenido = (estado.parcela && estado.parcela.trim()!=='') || estado.tambos.length>0;
+  if(!tieneContenido){
+    alert('Todavía no hay nada que guardar: captura al menos la parcela o un tambo.');
+    return;
+  }
+  const ok = archivarJornadaActual();
+  if(ok){
+    alert('✅ Formulario guardado en el historial (' + fmtFechaHora(new Date()) + ').\n\nPuedes seguir capturando tambos en esta misma jornada; cada vez que toques "Guardar" se agrega una copia nueva al historial.');
+  }
 }
 
 function abrirHistorial(){
@@ -1605,8 +1644,11 @@ function renderDetalleLectura(r){
     Object.keys(consumo).map(k=>`<tr><td>${k.replace(/\s\([A-Za-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([A-Za-z]+)\)$/)||['','' ])[1]}</td></tr>`).join('') +
     `</table></div>`;
 
+  const pctReg = inventario>0 ? Math.round((avance/inventario)*100) : null;
+  const semReg = pctReg!==null ? semaforoAvance(pctReg) : null;
   html += `<div class="detalle-section"><h3>Avance y jornaleros</h3><table>
     <tr><td>Avance en plantas</td><td class="num">${avance.toLocaleString('es-MX')}</td></tr>
+    <tr><td>% de avance</td><td class="num">${pctReg!==null ? semReg.emoji+' '+pctReg+'%' : '—'}</td></tr>
     <tr><td>Faltante por aplicar</td><td class="num">${inventario ? faltante.toLocaleString('es-MX') : '—'}</td></tr>
     <tr><td>Jornaleros requeridos</td><td class="num">${r.jornaleros||'—'}</td></tr>
   </table></div>`;
@@ -1635,6 +1677,9 @@ function generarPdfRegistro(r){
   const inventario = parseFloat(r.inventarioParcela)||0;
   const faltante = Math.max(inventario-avance, 0);
   const aguaTotal = (r.tambos||[]).reduce((s,t)=> s + (parseFloat(t.capacidad!==undefined?t.capacidad:200)||0), 0);
+  const pctPdf = inventario>0 ? Math.round((avance/inventario)*100) : null;
+  const semPdf = pctPdf!==null ? semaforoAvance(pctPdf) : null;
+  const colorSem = semPdf ? (semPdf.clase==='sem-verde'?'#2E7D46':semPdf.clase==='sem-amarillo'?'#D9A404':'#B4432F') : '#2F4A3C';
 
   let filas = '';
   (r.tambos||[]).forEach(t=>{
@@ -1709,6 +1754,7 @@ function generarPdfRegistro(r){
       <div class="stat"><b>${(r.tambos||[]).length}</b>Tambos realizados</div>
       <div class="stat"><b>${aguaTotal.toLocaleString('es-MX')} Lt</b>Agua consumida</div>
       <div class="stat"><b>${avance.toLocaleString('es-MX')}</b>Plantas tratadas</div>
+      <div class="stat" style="border-color:${colorSem};"><b style="color:${colorSem};">${pctPdf!==null ? semPdf.emoji+' '+pctPdf+'%' : '—'}</b>% de avance de la parcela</div>
       <div class="stat"><b>${inventario?faltante.toLocaleString('es-MX'):'—'}</b>Faltante por aplicar</div>
       <div class="stat"><b>${r.jornaleros||'—'}</b>Jornaleros requeridos</div>
     </div>
