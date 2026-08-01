@@ -482,7 +482,7 @@
 
   <!-- 2. RECETA POR TAMBO -->
   <div class="card">
-    <h2><span class="n">2</span>Receta por tambo (200 L)</h2>
+    <h2><span class="n">2</span>Receta por tambo (200 Lt)</h2>
     <p class="hint" style="margin-top:-6px;margin-bottom:8px;">Define la mezcla base para un tambo de 200 litros. Se usará como plantilla al registrar cada tambo aplicado.</p>
 
     <label class="first">Cargar receta predefinida (catálogo de la empresa)</label>
@@ -491,7 +491,7 @@
       <option value="pre_0_3">Pre-emergente al hilo (sello) · Edad 0-3 años</option>
       <option value="pre_4_6">Pre-emergente al hilo (sello) · Edad 4-6 años</option>
     </select>
-    <p class="hint" style="margin-bottom:10px;">Las dosis del catálogo son de referencia por hectárea; ajusta las cantidades de cada insumo según el agua real del tambo de 200 L antes de registrar el tambo.</p>
+    <p class="hint" style="margin-bottom:10px;">Las dosis del catálogo son de referencia por hectárea; ajusta las cantidades de cada insumo según el agua real del tambo de 200 Lt antes de registrar el tambo.</p>
 
     <div id="recetaRows"></div>
     <button class="btn btn-ghost btn-sm" onclick="agregarInsumoReceta()">+ Agregar insumo</button>
@@ -500,7 +500,7 @@
   <!-- 3. REGISTRO DE TAMBOS -->
   <div class="card">
     <h2><span class="n">3</span>Tambos aplicados en la jornada</h2>
-    <p class="hint" style="margin-top:-6px;margin-bottom:8px;">Cada vez que se prepara y aplica un tambo de 200 L, regístralo aquí. Se cargan las cantidades de la receta; ajústalas si ese tambo varió.</p>
+    <p class="hint" style="margin-top:-6px;margin-bottom:8px;">Cada vez que se prepara y aplica un tambo (hasta 200 Lt), regístralo aquí. Se cargan las cantidades de la receta; ajústalas si ese tambo varió.</p>
 
     <button class="btn btn-primary btn-block" onclick="abrirNuevoTambo()">+ Registrar tambo aplicado</button>
 
@@ -539,7 +539,7 @@
         <div class="l">Tambos realizados</div>
       </div>
       <div class="stat water">
-        <div class="v" id="sumAgua">0 L</div>
+        <div class="v" id="sumAgua">0 Lt</div>
         <div class="l">Agua consumida</div>
       </div>
       <div class="stat progress">
@@ -796,22 +796,22 @@ const RECETAS_PRESET = {
   pre_0_3: {
     label:'Pre-emergente al hilo (sello) · Edad 0-3 años',
     ingredientes:[
-      {nombre:'PHASE 1', cantidad:0.35, unidad:'l'},
+      {nombre:'PHASE 1', cantidad:0.35, unidad:'Lt'},
       {nombre:'KROVAR', cantidad:2.5, unidad:'kg'},
       {nombre:'ATRAZINA', cantidad:2, unidad:'kg'},
-      {nombre:'ASSURE 2', cantidad:0.25, unidad:'l'},
-      {nombre:'BREAK THRU', cantidad:0.1, unidad:'l'}
+      {nombre:'ASSURE 2', cantidad:0.25, unidad:'Lt'},
+      {nombre:'BREAK THRU', cantidad:0.1, unidad:'Lt'}
     ]
   },
   pre_4_6: {
     label:'Pre-emergente al hilo (sello) · Edad 4-6 años',
     ingredientes:[
-      {nombre:'PHASE 1', cantidad:0.35, unidad:'l'},
+      {nombre:'PHASE 1', cantidad:0.35, unidad:'Lt'},
       {nombre:'DIURON', cantidad:2, unidad:'kg'},
       {nombre:'ATRAZINA', cantidad:2, unidad:'kg'},
-      {nombre:'ASSURE 2', cantidad:0.25, unidad:'l'},
-      {nombre:'BREAK THRU', cantidad:0.1, unidad:'l'},
-      {nombre:'LUCAZINONA', cantidad:0.85, unidad:'l'}
+      {nombre:'ASSURE 2', cantidad:0.25, unidad:'Lt'},
+      {nombre:'BREAK THRU', cantidad:0.1, unidad:'Lt'},
+      {nombre:'LUCAZINONA', cantidad:0.85, unidad:'Lt'}
     ]
   }
 };
@@ -878,6 +878,9 @@ function iniciar(){
     if(!t.evidencias) t.evidencias = {preparacion:null, aplicacion:null, aguaLimpia:null};
     if(t.evidencias.aguaLimpia === undefined) t.evidencias.aguaLimpia = null;
     if(t.capacidad === undefined || t.capacidad === null || t.capacidad === '') t.capacidad = 200;
+    (t.ingredientes||[]).forEach(ing=>{
+      if(ing.dosisBase === undefined || ing.dosisBase === null){ ing.dosisBase = parseFloat(ing.cantidad) || 0; }
+    });
     if(!t.ph) t.ph = {valor:'', foto:null};
     if(!t.phAgua) t.phAgua = {valor:'', foto:null};
     if(t.preparadoPor === undefined) t.preparadoPor = '';
@@ -1077,7 +1080,7 @@ function pintarReceta(){
       <input type="text" placeholder="Insumo (ej. Glifosato)" value="${ing.nombre||''}" oninput="recetaCambio(${i},'nombre',this.value)">
       <input type="number" placeholder="Cantidad" value="${ing.cantidad||''}" oninput="recetaCambio(${i},'cantidad',this.value)" min="0">
       <select onchange="recetaCambio(${i},'unidad',this.value)">
-        ${['ml','l','g','kg'].map(u=>`<option value="${u}" ${ing.unidad===u?'selected':''}>${u}</option>`).join('')}
+        ${['ml','Lt','g','kg'].map(u=>`<option value="${u}" ${ing.unidad===u?'selected':''}>${u}</option>`).join('')}
       </select>
       <button class="del" onclick="quitarInsumoReceta(${i})">✕</button>
     `;
@@ -1103,7 +1106,7 @@ function abrirNuevoTambo(){
   const numero = estado.tambos.length + 1;
   const ingredientes = estado.receta
     .filter(i=>i.nombre && i.nombre.trim()!=='')
-    .map(i=>({nombre:i.nombre, cantidad:i.cantidad, unidad:i.unidad}));
+    .map(i=>({nombre:i.nombre, dosisBase: parseFloat(i.cantidad)||0, cantidad:i.cantidad, unidad:i.unidad}));
 
   if(ingredientes.length===0){
     alert('Primero completa al menos un insumo en la receta del tambo (sección 2).');
@@ -1140,7 +1143,11 @@ function tamboCambioPlantas(idx, valor){
   guardar();
 }
 function tamboCambioIngrediente(idx, ingIdx, valor){
-  estado.tambos[idx].ingredientes[ingIdx].cantidad = valor;
+  const t = estado.tambos[idx];
+  const ing = t.ingredientes[ingIdx];
+  ing.cantidad = valor;
+  const factor = (parseFloat(t.capacidad) || 0) / 200;
+  ing.dosisBase = factor > 0 ? (parseFloat(valor) || 0) / factor : (parseFloat(valor) || 0);
   actualizarResumen();
   guardar();
 }
@@ -1169,8 +1176,23 @@ function tamboCambioCapacidad(idx, valor){
   if(n > 200) n = 200;
   if(n < 0) n = 0;
   estado.tambos[idx].capacidad = n;
+  recalcularIngredientesTambo(idx);
+  pintarTambos();
   actualizarResumen();
   guardar();
+}
+// Escala una dosis definida para 200 L al volumen real del tambo
+function escalarDosis(dosisBase, capacidad){
+  const factor = (parseFloat(capacidad) || 0) / 200;
+  const valor = (parseFloat(dosisBase) || 0) * factor;
+  return Math.round(valor * 1000) / 1000; // hasta 3 decimales
+}
+function recalcularIngredientesTambo(idx){
+  const t = estado.tambos[idx];
+  t.ingredientes.forEach(ing=>{
+    if(ing.dosisBase === undefined || ing.dosisBase === null){ ing.dosisBase = parseFloat(ing.cantidad) || 0; }
+    ing.cantidad = escalarDosis(ing.dosisBase, t.capacidad);
+  });
 }
 
 function tamboCambioPh(idx, valor){
@@ -1277,7 +1299,7 @@ function pintarTambos(){
     card.className='tambo-card';
     card.innerHTML = `
       <div class="head">
-        <span>Tambo #${t.numero} · ${t.capacidad} L</span>
+        <span>Tambo #${t.numero} · ${t.capacidad} Lt</span>
         <button class="del" onclick="quitarTambo(${idx})">✕</button>
       </div>
       <div class="meta">Preparado a las:
@@ -1287,7 +1309,8 @@ function pintarTambos(){
       <input type="text" placeholder="Nombre de quien preparó el tambo" value="${t.preparadoPor||''}" oninput="tamboCambioPreparador(${idx}, this.value)">
 
       <label style="margin:10px 0 2px;">Capacidad usada del tambo (litros, máx. 200)</label>
-      <input type="number" min="0" max="200" step="1" value="${t.capacidad}" oninput="tamboCambioCapacidad(${idx}, this.value)">
+      <input type="number" min="0" max="200" step="1" value="${t.capacidad}" onchange="tamboCambioCapacidad(${idx}, this.value)">
+      <p class="hint" style="margin-top:4px;">Las dosis de los insumos se recalculan automáticamente según los litros de este tambo (la receta base está definida para 200 Lt).</p>
 
       <label style="margin:10px 0 2px;">Ingredientes usados</label>
       ${t.ingredientes.map((ing,i)=>`
@@ -1333,7 +1356,7 @@ function actualizarResumen(){
   const pct = inventario>0 ? Math.min(100, Math.round((avanceDiario/inventario)*100)) : 0;
 
   document.getElementById('sumTambos').textContent = totalTambos;
-  document.getElementById('sumAgua').textContent = aguaTotal.toLocaleString('es-MX') + ' L';
+  document.getElementById('sumAgua').textContent = aguaTotal.toLocaleString('es-MX') + ' Lt';
   document.getElementById('sumAvance').textContent = avanceDiario.toLocaleString('es-MX');
   document.getElementById('sumRestante').textContent = inventario>0 ? restante.toLocaleString('es-MX') : '—';
   document.getElementById('progFill').style.width = pct + '%';
@@ -1388,7 +1411,7 @@ function actualizarResumen(){
   }else{
     keys.forEach(k=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${k.replace(/\s\([a-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${k.match(/\(([a-z]+)\)$/)[1]}</td>`;
+      tr.innerHTML = `<td>${k.replace(/\s\([A-Za-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${k.match(/\(([A-Za-z]+)\)$/)[1]}</td>`;
       tbody.appendChild(tr);
     });
   }
@@ -1564,7 +1587,7 @@ function renderDetalleLectura(r){
 
   html += `<div class="detalle-section"><h3>Tambos aplicados (${(r.tambos||[]).length})</h3>`;
   (r.tambos||[]).forEach(t=>{
-    html += `<p style="font-size:13px;margin:6px 0 2px;"><b>Tambo #${t.numero}</b> · ${t.hora||''} · Preparado por: ${t.preparadoPor||'—'} · Capacidad: ${t.capacidad!==undefined?t.capacidad:200} L</p>`;
+    html += `<p style="font-size:13px;margin:6px 0 2px;"><b>Tambo #${t.numero}</b> · ${t.hora||''} · Preparado por: ${t.preparadoPor||'—'} · Capacidad: ${t.capacidad!==undefined?t.capacidad:200} Lt</p>`;
     html += `<table>` + (t.ingredientes||[]).map(ing=>`<tr><td>${ing.nombre}</td><td class="num">${ing.cantidad} ${ing.unidad}</td></tr>`).join('') + `</table>`;
     const fotos = [];
     if(t.evidencias && t.evidencias.aguaLimpia) fotos.push([t.evidencias.aguaLimpia,'Agua limpia']);
@@ -1579,7 +1602,7 @@ function renderDetalleLectura(r){
   html += `</div>`;
 
   html += `<div class="detalle-section"><h3>Consumo de insumos</h3><table>` +
-    Object.keys(consumo).map(k=>`<tr><td>${k.replace(/\s\([a-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([a-z]+)\)$/)||['','' ])[1]}</td></tr>`).join('') +
+    Object.keys(consumo).map(k=>`<tr><td>${k.replace(/\s\([A-Za-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([A-Za-z]+)\)$/)||['','' ])[1]}</td></tr>`).join('') +
     `</table></div>`;
 
   html += `<div class="detalle-section"><h3>Avance y jornaleros</h3><table>
@@ -1620,7 +1643,7 @@ function generarPdfRegistro(r){
       <td>${t.numero}</td>
       <td>${(t.hora||'').split(' ')[1]||t.hora||''}</td>
       <td>${t.preparadoPor||'—'}</td>
-      <td>${t.capacidad!==undefined?t.capacidad:200} L</td>
+      <td>${t.capacidad!==undefined?t.capacidad:200} Lt</td>
       <td>${ings}</td>
       <td>${t.ph?t.ph.valor:''}</td>
       <td>${t.phAgua?t.phAgua.valor:''}</td>
@@ -1644,7 +1667,7 @@ function generarPdfRegistro(r){
   });
 
   const consumoHtml = Object.keys(consumo).map(k=>
-    `<tr><td>${k.replace(/\s\([a-z]+\)$/,'')}</td><td>${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([a-z]+)\)$/)||['',''])[1]}</td></tr>`
+    `<tr><td>${k.replace(/\s\([A-Za-z]+\)$/,'')}</td><td>${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([A-Za-z]+)\)$/)||['',''])[1]}</td></tr>`
   ).join('');
 
   const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
@@ -1684,7 +1707,7 @@ function generarPdfRegistro(r){
     <h2>Resumen de la jornada</h2>
     <div class="stats">
       <div class="stat"><b>${(r.tambos||[]).length}</b>Tambos realizados</div>
-      <div class="stat"><b>${aguaTotal.toLocaleString('es-MX')} L</b>Agua consumida</div>
+      <div class="stat"><b>${aguaTotal.toLocaleString('es-MX')} Lt</b>Agua consumida</div>
       <div class="stat"><b>${avance.toLocaleString('es-MX')}</b>Plantas tratadas</div>
       <div class="stat"><b>${inventario?faltante.toLocaleString('es-MX'):'—'}</b>Faltante por aplicar</div>
       <div class="stat"><b>${r.jornaleros||'—'}</b>Jornaleros requeridos</div>
