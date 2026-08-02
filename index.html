@@ -369,6 +369,15 @@
   .stat.water .v{color:var(--water);}
   .stat.progress{background:#FBEFDD;}
   .stat.progress .v{color:var(--ochre-dark);}
+  .stat.sem-verde{background:#E3F2E7;}
+  .stat.sem-verde .v{color:#2E7D46;}
+  .stat.sem-amarillo{background:#FBF1D2;}
+  .stat.sem-amarillo .v{color:#A87B00;}
+  .stat.sem-rojo{background:#FAE4E0;}
+  .stat.sem-rojo .v{color:var(--danger);}
+
+  input.ph-ok{border-color:#2E7D46 !important;background:#EAF6EC !important;}
+  input.ph-fuera{border-color:var(--danger) !important;background:#FBEAE7 !important;}
 
   table.resumen{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px;}
   table.resumen th, table.resumen td{
@@ -566,11 +575,11 @@
         <div class="v" id="sumEvidencias">0</div>
         <div class="l">Evidencias fotográficas</div>
       </div>
-      <div class="stat">
+      <div class="stat" id="statPhMezcla">
         <div class="v" id="sumPhProm">—</div>
         <div class="l">pH de mezcla (promedio)</div>
       </div>
-      <div class="stat">
+      <div class="stat" id="statPhAgua">
         <div class="v" id="sumPhAguaProm">—</div>
         <div class="l">pH de agua (promedio)</div>
       </div>
@@ -600,7 +609,7 @@
     <input type="number" id="jornalerosReq" min="0" placeholder="Ej. 6">
 
     <div class="summary-grid" style="margin-top:12px;">
-      <div class="stat">
+      <div class="stat" id="statRendimiento">
         <div class="v" id="avanceRendimiento">—</div>
         <div class="l">Plantas por jornalero</div>
       </div>
@@ -609,6 +618,7 @@
         <div class="l">Faltante por aplicar en la parcela</div>
       </div>
     </div>
+    <p class="hint">Estándar de referencia: 3,000 a 3,500 plantas por jornalero al día.</p>
     <p class="hint">Faltante = inventario real de la parcela − avance diario en plantas.</p>
   </div>
 
@@ -1222,11 +1232,13 @@ function recalcularIngredientesTambo(idx){
 
 function tamboCambioPh(idx, valor){
   estado.tambos[idx].ph.valor = valor;
+  aplicarSemaforoPhInput('ph_'+idx, valor);
   actualizarResumen();
   guardar();
 }
 function tamboCambioPhAgua(idx, valor){
   estado.tambos[idx].phAgua.valor = valor;
+  aplicarSemaforoPhInput('phAgua_'+idx, valor);
   actualizarResumen();
   guardar();
 }
@@ -1355,19 +1367,23 @@ function pintarTambos(){
           <div class="ph-slot-head">
             <span>pH del agua · Tambo #${t.numero}</span>
           </div>
-          <input type="number" step="0.01" min="0" max="14" placeholder="Valor de pH del agua (ej. 7.2)" value="${t.phAgua ? t.phAgua.valor : ''}" oninput="tamboCambioPhAgua(${idx}, this.value)" style="margin-bottom:6px;">
+          <input type="number" id="phAgua_${idx}" step="0.01" min="0" max="14" placeholder="Valor de pH del agua (ej. 7.2)" value="${t.phAgua ? t.phAgua.valor : ''}" oninput="tamboCambioPhAgua(${idx}, this.value)" style="margin-bottom:6px;">
           ${fotoSlot(idx, 'phAgua', 'Foto del potenciómetro (agua)', t.phAgua ? t.phAgua.foto : null, t.numero)}
         </div>
         <div class="ph-slot">
           <div class="ph-slot-head">
             <span>pH de la preparación · Tambo #${t.numero}</span>
           </div>
-          <input type="number" step="0.01" min="0" max="14" placeholder="Valor de pH (ej. 5.4)" value="${t.ph.valor}" oninput="tamboCambioPh(${idx}, this.value)" style="margin-bottom:6px;">
+          <input type="number" id="ph_${idx}" step="0.01" min="0" max="14" placeholder="Valor de pH (ej. 5.4)" value="${t.ph.valor}" oninput="tamboCambioPh(${idx}, this.value)" style="margin-bottom:6px;">
           ${fotoSlot(idx, 'ph', 'Foto del potenciómetro', t.ph.foto, t.numero)}
         </div>
       </div>
     `;
     cont.appendChild(card);
+  });
+  estado.tambos.forEach((t, idx)=>{
+    aplicarSemaforoPhInput('ph_'+idx, t.ph ? t.ph.valor : '');
+    aplicarSemaforoPhInput('phAgua_'+idx, t.phAgua ? t.phAgua.valor : '');
   });
 }
 
@@ -1376,6 +1392,38 @@ function semaforoAvance(pct){
   if(pct >= 100) return {clase:'sem-verde', emoji:'🟢'};
   if(pct >= 71) return {clase:'sem-amarillo', emoji:'🟡'};
   return {clase:'sem-rojo', emoji:'🔴'};
+}
+
+// Semaforización del rendimiento (plantas por jornalero) contra el estándar de 3,000 a 3,500 plantas
+function semaforoRendimiento(promedio){
+  if(!promedio || promedio<=0) return '';
+  const pctEstandar = (promedio/3500)*100; // 3500 = techo del estándar = 100%
+  if(pctEstandar >= 100) return 'sem-verde';
+  if(pctEstandar >= 80) return 'sem-amarillo';
+  return 'sem-rojo';
+}
+
+// Semaforización del pH: verde solo cuando está entre 4.0 y 4.5
+function semaforoPh(valor){
+  const v = parseFloat(valor);
+  if(valor === '' || valor === null || valor === undefined || isNaN(v)) return {clase:'', emoji:''};
+  if(v >= 4.0 && v <= 4.5) return {clase:'sem-verde', emoji:'🟢'};
+  return {clase:'sem-rojo', emoji:'🔴'};
+}
+function aplicarClaseSemaforo(elId, clase){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  el.classList.remove('sem-verde','sem-amarillo','sem-rojo');
+  if(clase) el.classList.add(clase);
+}
+// Colorea en vivo el recuadro de un input de pH (sin volver a pintar toda la tarjeta, para no perder el foco)
+function aplicarSemaforoPhInput(inputId, valor){
+  const el = document.getElementById(inputId);
+  if(!el) return;
+  el.classList.remove('ph-ok','ph-fuera');
+  const sem = semaforoPh(valor);
+  if(sem.clase === 'sem-verde') el.classList.add('ph-ok');
+  else if(sem.clase === 'sem-rojo') el.classList.add('ph-fuera');
 }
 
 /* ---------------- Resumen ---------------- */
@@ -1429,13 +1477,17 @@ function actualizarResumen(){
   document.getElementById('sumEvidencias').textContent = totalFotos + estado.evidenciasGenerales.length;
   document.getElementById('sumPhProm').textContent = cuentaPh>0 ? (sumaPh/cuentaPh).toFixed(2) : '—';
   document.getElementById('sumPhAguaProm').textContent = cuentaPhAgua>0 ? (sumaPhAgua/cuentaPhAgua).toFixed(2) : '—';
+  aplicarClaseSemaforo('statPhMezcla', cuentaPh>0 ? semaforoPh(sumaPh/cuentaPh).clase : '');
+  aplicarClaseSemaforo('statPhAgua', cuentaPhAgua>0 ? semaforoPh(sumaPhAgua/cuentaPhAgua).clase : '');
 
   // avance diario y jornaleros (sección 6, captura manual)
   document.getElementById('avanceFaltante').textContent = inventario>0 ? restante.toLocaleString('es-MX') : '—';
   const jornaleros = parseFloat(estado.jornaleros) || 0;
-  document.getElementById('avanceRendimiento').textContent = (jornaleros>0 && avanceDiario>0)
-    ? Math.round(avanceDiario/jornaleros).toLocaleString('es-MX')
+  const promedioJornalero = (jornaleros>0 && avanceDiario>0) ? (avanceDiario/jornaleros) : 0;
+  document.getElementById('avanceRendimiento').textContent = promedioJornalero>0
+    ? Math.round(promedioJornalero).toLocaleString('es-MX')
     : '—';
+  aplicarClaseSemaforo('statRendimiento', promedioJornalero>0 ? semaforoRendimiento(promedioJornalero) : '');
 
   // consumo por insumo
   const consumo = {};
@@ -1720,11 +1772,15 @@ function renderDetalleLectura(r){
 
   const pctReg = inventario>0 ? Math.round((avance/inventario)*100) : null;
   const semReg = pctReg!==null ? semaforoAvance(pctReg) : null;
+  const jornalerosNum = parseFloat(r.jornaleros) || 0;
+  const promedioReg = jornalerosNum>0 ? Math.round(avance/jornalerosNum) : null;
+  const emojiRend = promedioReg!==null ? ({'sem-verde':'🟢','sem-amarillo':'🟡','sem-rojo':'🔴'}[semaforoRendimiento(promedioReg)] || '') : '';
   html += `<div class="detalle-section"><h3>Avance y jornaleros</h3><table>
     <tr><td>Avance en plantas</td><td class="num">${avance.toLocaleString('es-MX')}</td></tr>
     <tr><td>% de avance</td><td class="num">${pctReg!==null ? semReg.emoji+' '+pctReg+'%' : '—'}</td></tr>
     <tr><td>Faltante por aplicar</td><td class="num">${inventario ? faltante.toLocaleString('es-MX') : '—'}</td></tr>
     <tr><td>Jornaleros requeridos</td><td class="num">${r.jornaleros||'—'}</td></tr>
+    <tr><td>Plantas por jornalero</td><td class="num">${promedioReg!==null ? emojiRend+' '+promedioReg.toLocaleString('es-MX') : '—'}</td></tr>
   </table></div>`;
 
   if((r.evidenciasGenerales||[]).length){
@@ -1754,6 +1810,11 @@ function generarPdfRegistro(r){
   const pctPdf = inventario>0 ? Math.round((avance/inventario)*100) : null;
   const semPdf = pctPdf!==null ? semaforoAvance(pctPdf) : null;
   const colorSem = semPdf ? (semPdf.clase==='sem-verde'?'#2E7D46':semPdf.clase==='sem-amarillo'?'#D9A404':'#B4432F') : '#2F4A3C';
+  const jornalerosPdf = parseFloat(r.jornaleros) || 0;
+  const promedioPdf = jornalerosPdf>0 ? Math.round(avance/jornalerosPdf) : null;
+  const claseRendPdf = promedioPdf!==null ? semaforoRendimiento(promedioPdf) : '';
+  const colorRendPdf = claseRendPdf==='sem-verde'?'#2E7D46':claseRendPdf==='sem-amarillo'?'#D9A404':claseRendPdf==='sem-rojo'?'#B4432F':'#2F4A3C';
+  const emojiRendPdf = claseRendPdf==='sem-verde'?'🟢':claseRendPdf==='sem-amarillo'?'🟡':claseRendPdf==='sem-rojo'?'🔴':'';
 
   let filas = '';
   (r.tambos||[]).forEach(t=>{
@@ -1831,6 +1892,7 @@ function generarPdfRegistro(r){
       <div class="stat" style="border-color:${colorSem};"><b style="color:${colorSem};">${pctPdf!==null ? semPdf.emoji+' '+pctPdf+'%' : '—'}</b>% de avance de la parcela</div>
       <div class="stat"><b>${inventario?faltante.toLocaleString('es-MX'):'—'}</b>Faltante por aplicar</div>
       <div class="stat"><b>${r.jornaleros||'—'}</b>Jornaleros requeridos</div>
+      <div class="stat" style="border-color:${colorRendPdf};"><b style="color:${colorRendPdf};">${promedioPdf!==null ? emojiRendPdf+' '+promedioPdf.toLocaleString('es-MX') : '—'}</b>Plantas por jornalero</div>
     </div>
 
     <h2>Consumo total por insumo</h2>
