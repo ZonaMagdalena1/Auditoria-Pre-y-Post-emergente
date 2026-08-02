@@ -443,6 +443,12 @@
     </p>
   </div>
 
+  <div class="card" id="avisoEdicion" style="display:none;background:var(--sage-pale);border-color:var(--agave);">
+    <h2 style="color:var(--agave-dark);"><span class="n">✏️</span>Editando un registro guardado</h2>
+    <p class="hint" style="margin-top:0;font-size:13px;" id="avisoEdicionTexto">Estás editando un registro del historial. Al tocar "💾 Guardar" se actualizará ese mismo registro (no se creará uno duplicado).</p>
+    <button class="btn btn-ghost btn-sm" onclick="cancelarEdicionHistorial()" type="button">Cancelar edición</button>
+  </div>
+
   <!-- 1. DATOS GENERALES -->
   <div class="card">
     <h2><span class="n">1</span>Datos de la jornada</h2>
@@ -660,8 +666,12 @@
     </div>
     <div id="detalleContenido"></div>
     <div class="row2" style="margin-top:12px;">
-      <button class="btn btn-ghost" onclick="descargarTodasLasFotos()" type="button">⬇️ Descargar todas las fotos</button>
+      <button class="btn btn-ghost" onclick="descargarTodasLasFotos()" type="button">⬇️ Descargar fotos</button>
       <button class="btn btn-ochre" onclick="generarPdfDesdeDetalle()" type="button">📄 Generar PDF</button>
+    </div>
+    <div class="row2" style="margin-top:8px;">
+      <button class="btn btn-primary" onclick="editarRegistroDesdeDetalle()" type="button">✏️ Editar este registro</button>
+      <button class="btn btn-danger" onclick="borrarRegistroDesdeDetalle()" type="button">🗑️ Borrar este registro</button>
     </div>
   </div>
 </div>
@@ -842,7 +852,8 @@ let estado = {
   evidenciasGenerales: [], // [{dataUrl, hora}]
   kml: null,    // {archivo, placemark, vertices, areaHa}
   auditor: {nombre:'Jorge López Carranza', firma:null, fecha:''},
-  observaciones: ''
+  observaciones: '',
+  _editandoHistorialId: null
 };
 
 /* ---------------- Utilidades ---------------- */
@@ -871,6 +882,13 @@ function iniciar(){
   cargar();
   if(typeof esContextoSeguro === 'function' && !esContextoSeguro()){
     document.getElementById('avisoInseguro').style.display = 'block';
+  }
+  if(estado._editandoHistorialId){
+    document.getElementById('avisoEdicion').style.display = 'block';
+    document.getElementById('avisoEdicionTexto').textContent =
+      `Estás editando el registro de "${estado.parcela||'sin parcela'}" (${estado.fechaHora||''}). Al tocar "💾 Guardar" se actualizará ese mismo registro, no se creará uno duplicado.`;
+  }else{
+    document.getElementById('avisoEdicion').style.display = 'none';
   }
   if(!estado.fechaHora){
     estado.fechaHora = fmtFechaHora(new Date());
@@ -1497,8 +1515,21 @@ function archivarJornadaActual(){
   if(!tieneContenido) return false;
   const historial = cargarHistorial();
   const copia = JSON.parse(JSON.stringify(estado));
+
+  if(estado._editandoHistorialId){
+    const idx = historial.findIndex(r=>r._id === estado._editandoHistorialId);
+    if(idx !== -1){
+      copia._id = estado._editandoHistorialId;
+      copia._archivadoEn = fmtFechaHora(new Date());
+      historial[idx] = copia;
+      return guardarHistorial(historial);
+    }
+    // si ya no existe (se borró desde otro lado), se guarda como uno nuevo
+  }
+
   copia._id = 'jornada_' + Date.now();
   copia._archivadoEn = fmtFechaHora(new Date());
+  delete copia._editandoHistorialId;
   historial.push(copia);
   return guardarHistorial(historial);
 }
@@ -1511,9 +1542,14 @@ function guardarFormularioDelDia(){
     alert('Todavía no hay nada que guardar: captura al menos la parcela o un tambo.');
     return;
   }
+  const editando = !!estado._editandoHistorialId;
   const ok = archivarJornadaActual();
   if(ok){
-    alert('✅ Formulario guardado en el historial (' + fmtFechaHora(new Date()) + ').\n\nPuedes seguir capturando tambos en esta misma jornada; cada vez que toques "Guardar" se agrega una copia nueva al historial.');
+    if(editando){
+      alert('✅ Registro actualizado en el historial (' + fmtFechaHora(new Date()) + ').');
+    }else{
+      alert('✅ Formulario guardado en el historial (' + fmtFechaHora(new Date()) + ').\n\nPuedes seguir capturando tambos en esta misma jornada; cada vez que toques "Guardar" se agrega una copia nueva al historial.');
+    }
   }
 }
 
@@ -1543,9 +1579,18 @@ function pintarHistorial(){
       <div class="historial-item">
         <div class="top"><span>${r.parcela || 'Sin parcela'}</span><span>${r.fechaHora || ''}</span></div>
         <div class="sub">Jefe de Área: ${r.jefeArea||'—'} · Supervisor: ${r.supervisor||'—'} · ${r.tambos.length} tambos · ${totalFotos} fotos</div>
-        <button class="btn btn-primary btn-sm btn-block" onclick="verDetalleRegistro('${r._id}')" type="button">Ver detalle y generar PDF</button>
+        <div class="row2">
+          <button class="btn btn-primary btn-sm" onclick="verDetalleRegistro('${r._id}')" type="button">Ver detalle</button>
+          <button class="btn btn-danger btn-sm" onclick="borrarRegistroHistorial('${r._id}')" type="button">🗑️ Borrar</button>
+        </div>
       </div>`;
   }).join('');
+}
+function borrarRegistroHistorial(id){
+  if(!confirm('¿Borrar este registro del historial? Esta acción no se puede deshacer (se perderán sus datos y fotografías guardadas).')) return;
+  const historial = cargarHistorial().filter(r=>r._id !== id);
+  guardarHistorial(historial);
+  pintarHistorial();
 }
 function contarFotosRegistro(r){
   let n = 0;
@@ -1573,6 +1618,35 @@ function cerrarDetalle(){
 }
 function generarPdfDesdeDetalle(){
   if(_registroDetalleActual) generarPdfRegistro(_registroDetalleActual);
+}
+function editarRegistroDesdeDetalle(){
+  if(!_registroDetalleActual) return;
+  const tieneContenidoActual = (estado.parcela && estado.parcela.trim()!=='') || estado.tambos.length>0;
+  if(tieneContenidoActual && estado._editandoHistorialId !== _registroDetalleActual._id){
+    const continuar = confirm('Vas a editar este registro guardado. Esto reemplazará el formulario que tienes abierto ahora mismo en pantalla.\n\nSi el formulario actual tiene datos sin guardar, primero ciérralo con "💾 Guardar" y luego vuelve a intentar editar este registro.\n\n¿Deseas continuar de todas formas?');
+    if(!continuar) return;
+  }
+  estado = JSON.parse(JSON.stringify(_registroDetalleActual));
+  estado._editandoHistorialId = _registroDetalleActual._id;
+  guardar();
+  cerrarDetalle();
+  cerrarHistorial();
+  iniciar();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function cancelarEdicionHistorial(){
+  if(!confirm('¿Cancelar la edición? El formulario seguirá abierto con estos datos, pero al guardar se creará un registro nuevo en vez de actualizar el original.')) return;
+  estado._editandoHistorialId = null;
+  guardar();
+  document.getElementById('avisoEdicion').style.display = 'none';
+}
+function borrarRegistroDesdeDetalle(){
+  if(!_registroDetalleActual) return;
+  if(!confirm('¿Borrar este registro del historial? Esta acción no se puede deshacer (se perderán sus datos y fotografías guardadas).')) return;
+  const historial = cargarHistorial().filter(r=>r._id !== _registroDetalleActual._id);
+  guardarHistorial(historial);
+  cerrarDetalle();
+  pintarHistorial();
 }
 function descargarTodasLasFotos(){
   if(!_registroDetalleActual) return;
