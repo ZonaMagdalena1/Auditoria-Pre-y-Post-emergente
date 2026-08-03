@@ -715,6 +715,7 @@
       <label class="first" style="margin-top:0;">📊 Resumen general del día (varias parcelas)</label>
       <select id="resumenFechaSelect" onchange="pintarResumenDia()"></select>
       <div id="resumenDiaContenido" style="margin-top:8px;"></div>
+      <button class="btn btn-danger btn-sm" onclick="borrarResumenDelDia()" type="button" style="margin-top:10px;">🗑️ Borrar todos los registros guardados de este día</button>
     </div>
 
     <label class="first">Filtrar por parcela</label>
@@ -1784,6 +1785,32 @@ function pintarResumenDia(){
   const cont = document.getElementById('resumenDiaContenido');
   if(!fecha){ cont.innerHTML=''; return; }
   cont.innerHTML = construirHtmlResumenDia(fecha);
+}
+// Borra del historial todos los registros guardados de la fecha elegida en el resumen del día
+// (no afecta la jornada activa en pantalla si aún no se ha guardado)
+function borrarResumenDelDia(){
+  const fecha = document.getElementById('resumenFechaSelect').value;
+  if(!fecha){ alert('Elige primero una fecha en el resumen del día.'); return; }
+  const historial = cargarHistorial();
+  const aBorrar = historial.filter(r=> extraerFecha(r.fechaHora) === fecha);
+  if(aBorrar.length === 0){
+    alert('No hay registros guardados en el historial para el ' + fecha + ' (solo tu jornada activa sin guardar, que no se borra desde aquí).');
+    return;
+  }
+  if(!confirm(`¿Borrar los ${aBorrar.length} registro(s) guardados del ${fecha}? Se eliminarán junto con sus fotografías. Esta acción no se puede deshacer.`)) return;
+
+  const restante = historial.filter(r=> extraerFecha(r.fechaHora) !== fecha);
+  guardarHistorial(restante);
+
+  // si la jornada activa estaba vinculada a alguno de los registros borrados, la desvincula
+  if(estado._editandoHistorialId && aBorrar.some(r=>r._id === estado._editandoHistorialId)){
+    estado._editandoHistorialId = null;
+    guardar();
+  }
+
+  abrirHistorial();
+  pintarResumenDiaPrincipal();
+  alert('Registros del ' + fecha + ' eliminados del historial.');
 }
 function pintarHistorial(){
   const historial = cargarHistorial().slice().reverse(); // más reciente primero
