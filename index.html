@@ -566,7 +566,16 @@
   <div class="card">
     <h2><span class="n">4</span>Evidencias generales y polígono de trabajo</h2>
 
-    <label class="first">Fotografías de evidencia adicionales</label>
+    <label class="first">Altura de maleza (nivel del suelo a la parte más alta)</label>
+    <p class="hint" style="margin-top:-2px;">Captura la medida con una cinta o estaca graduada visible en la foto; la medida se imprime sobre la fotografía automáticamente.</p>
+    <input type="number" id="alturaMalezaValor" min="0" step="0.5" placeholder="Altura medida (cm)" style="margin-top:6px;">
+    <label class="foto-capture-btn" for="fotoAlturaInput" style="margin-top:8px;">
+      📷 Tomar foto con la medida
+      <input type="file" id="fotoAlturaInput" accept="image/*" capture="environment" style="display:none;" onchange="onFotoAlturaMaleza(this)">
+    </label>
+    <div id="galeriaAlturaMaleza" class="galeria-general"></div>
+
+    <label style="margin-top:16px;">Fotografías de evidencia adicionales</label>
     <p class="hint" style="margin-top:-2px;">Fotos generales de la jornada que no correspondan a un tambo en particular (acceso, letrero de la parcela, equipo, etc.).</p>
     <label class="foto-capture-btn" for="fotoGeneralInput" style="margin-top:6px;">
       📷 Agregar fotografía de evidencia
@@ -907,6 +916,7 @@ let estado = {
   receta: [],   // {nombre, cantidad, unidad}
   tambos: [],   // {numero, hora, plantas, ingredientes, evidencias:{preparacion,aplicacion}, ph:{valor,foto}}
   evidenciasGenerales: [], // [{dataUrl, hora}]
+  alturaMaleza: [], // [{dataUrl, alturaCm, hora}]
   kml: null,    // {archivo, placemark, vertices, areaHa}
   auditor: {nombre:'Jorge López Carranza', firma:null, fecha:''},
   observaciones: '',
@@ -954,6 +964,7 @@ function iniciar(){
     estado.receta = [{nombre:'', cantidad:'', unidad:'ml'}];
   }
   if(!estado.evidenciasGenerales) estado.evidenciasGenerales = [];
+  if(!estado.alturaMaleza) estado.alturaMaleza = [];
   if(estado.kml === undefined) estado.kml = null;
   if(!estado.auditor) estado.auditor = {nombre:'Jorge López Carranza', firma:null, fecha:''};
   estado.tambos.forEach(t=>{
@@ -998,6 +1009,7 @@ function iniciar(){
   pintarReceta();
   pintarTambos();
   pintarGaleriaGeneral();
+  pintarGaleriaAlturaMaleza();
   pintarKmlInfo();
   initFirma();
   actualizarResumen();
@@ -1521,7 +1533,7 @@ function actualizarResumen(){
       cuentaPhAgua++;
     }
   });
-  document.getElementById('sumEvidencias').textContent = totalFotos + estado.evidenciasGenerales.length;
+  document.getElementById('sumEvidencias').textContent = totalFotos + estado.evidenciasGenerales.length + estado.alturaMaleza.length;
   document.getElementById('sumPhProm').textContent = cuentaPh>0 ? (sumaPh/cuentaPh).toFixed(2) : '—';
   document.getElementById('sumPhAguaProm').textContent = cuentaPhAgua>0 ? (sumaPhAgua/cuentaPhAgua).toFixed(2) : '—';
   aplicarClaseSemaforo('statPhMezcla', cuentaPh>0 ? semaforoPh(sumaPh/cuentaPh).clase : '');
@@ -1810,6 +1822,7 @@ function contarFotosRegistro(r){
     if(t.phAgua && t.phAgua.foto) n++;
   });
   n += (r.evidenciasGenerales||[]).length;
+  n += (r.alturaMaleza||[]).length;
   return n;
 }
 
@@ -1871,6 +1884,7 @@ function descargarTodasLasFotos(){
     if(t.phAgua && t.phAgua.foto) lista.push([t.phAgua.foto, `tambo${t.numero}_ph_agua.jpg`]);
   });
   (r.evidenciasGenerales||[]).forEach((ev,i)=> lista.push([ev.dataUrl, `evidencia_general_${i+1}.jpg`]));
+  (r.alturaMaleza||[]).forEach((ev,i)=> lista.push([ev.dataUrl, `altura_maleza_${ev.alturaCm}cm_${i+1}.jpg`]));
   if(lista.length===0){ alert('Este registro no tiene fotografías guardadas.'); return; }
   lista.forEach((f,i)=>{
     setTimeout(()=> descargarFoto(f[0], f[1]), i*350);
@@ -1942,6 +1956,11 @@ function renderDetalleLectura(r){
     <tr><td>Plantas por jornalero</td><td class="num">${promedioReg!==null ? emojiRend+' '+promedioReg.toLocaleString('es-MX') : '—'}</td></tr>
   </table></div>`;
 
+  if((r.alturaMaleza||[]).length){
+    html += `<div class="detalle-section"><h3>Altura de maleza</h3><div class="detalle-fotos">` +
+      r.alturaMaleza.map((ev,i)=>`<div><img src="${ev.dataUrl}"><div class="cap">${ev.alturaCm} cm<br><button onclick="descargarFoto('${ev.dataUrl}','altura_maleza_${i+1}.jpg')" type="button" style="border:none;background:none;color:var(--agave-dark);cursor:pointer;">⬇️ Descargar</button></div></div>`).join('') + `</div></div>`;
+  }
+
   if((r.evidenciasGenerales||[]).length){
     html += `<div class="detalle-section"><h3>Evidencias generales</h3><div class="detalle-fotos">` +
       r.evidenciasGenerales.map((ev,i)=>`<div><img src="${ev.dataUrl}"><div class="cap">Evidencia #${i+1}<br><button onclick="descargarFoto('${ev.dataUrl}','evidencia_general_${i+1}.jpg')" type="button" style="border:none;background:none;color:var(--agave-dark);cursor:pointer;">⬇️ Descargar</button></div></div>`).join('') + `</div></div>`;
@@ -2003,6 +2022,9 @@ function generarPdfRegistro(r){
   });
   (r.evidenciasGenerales||[]).forEach((ev,i)=>{
     fotosHtml += `<div class="foto-pdf"><img src="${ev.dataUrl}"><div class="cap">Evidencia general #${i+1}</div></div>`;
+  });
+  (r.alturaMaleza||[]).forEach((ev,i)=>{
+    fotosHtml += `<div class="foto-pdf"><img src="${ev.dataUrl}"><div class="cap">Altura de maleza: ${ev.alturaCm} cm</div></div>`;
   });
 
   const consumoHtml = Object.keys(consumo).map(k=>
@@ -2090,6 +2112,87 @@ function generarPdfRegistro(r){
 }
 
 /* ---------------- Evidencias generales ---------------- */
+/* ---------------- Altura de maleza (medida impresa sobre la foto) ---------------- */
+function onFotoAlturaMaleza(inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  const alturaInput = document.getElementById('alturaMalezaValor');
+  const altura = alturaInput.value.trim();
+  if(altura === '' || isNaN(parseFloat(altura))){
+    alert('Primero escribe la altura medida (en cm) antes de tomar la foto.');
+    inputEl.value = '';
+    return;
+  }
+  anotarAlturaEnFoto(file, altura, dataUrl=>{
+    estado.alturaMaleza.push({dataUrl, alturaCm: altura, hora: fmtFechaHora(new Date())});
+    pintarGaleriaAlturaMaleza();
+    guardar();
+    alturaInput.value = '';
+  });
+  inputEl.value = '';
+}
+function quitarFotoAltura(i){
+  estado.alturaMaleza.splice(i,1);
+  pintarGaleriaAlturaMaleza();
+  guardar();
+}
+function pintarGaleriaAlturaMaleza(){
+  const cont = document.getElementById('galeriaAlturaMaleza');
+  if(!cont) return;
+  if(!estado.alturaMaleza.length){ cont.innerHTML=''; return; }
+  cont.innerHTML = estado.alturaMaleza.map((ev,i)=>`
+    <div class="galeria-item">
+      <img src="${ev.dataUrl}" alt="Altura de maleza ${ev.alturaCm} cm">
+      <div class="cap"><span>${ev.alturaCm} cm · ${(ev.hora||'').split(' ')[1]||''}</span>
+        <span>
+          <button onclick="descargarFoto('${ev.dataUrl}', 'altura_maleza_${ev.alturaCm}cm.jpg')" type="button" title="Descargar" style="color:var(--agave-dark);">⬇️</button>
+          <button onclick="quitarFotoAltura(${i})" type="button" title="Quitar">✕</button>
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+// Dibuja la foto en un canvas y le imprime encima la medida capturada (queda "quemada" en la imagen)
+function anotarAlturaEnFoto(file, alturaCm, cb){
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const maxW = 1000;
+      let w = img.width, h = img.height;
+      if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // etiqueta con la medida
+      const texto = `Altura de maleza: ${alturaCm} cm`;
+      const fontSize = Math.max(18, Math.round(w * 0.045));
+      ctx.font = `700 ${fontSize}px Arial, sans-serif`;
+      const padding = Math.round(fontSize * 0.6);
+      const textW = ctx.measureText(texto).width;
+      const boxW = textW + padding*2;
+      const boxH = fontSize + padding*1.6;
+      const boxX = padding;
+      const boxY = h - boxH - padding;
+
+      ctx.fillStyle = 'rgba(47,74,60,0.82)'; // verde agave semitransparente
+      ctx.beginPath();
+      if(ctx.roundRect){ ctx.roundRect(boxX, boxY, boxW, boxH, 8); } else { ctx.rect(boxX, boxY, boxW, boxH); }
+      ctx.fill();
+
+      ctx.fillStyle = '#F3F1E7';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(texto, boxX + padding, boxY + boxH/2 + 1);
+
+      cb(canvas.toDataURL('image/jpeg', 0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function onFotoGeneral(inputEl){
   const file = inputEl.files && inputEl.files[0];
   if(!file) return;
