@@ -592,9 +592,24 @@
     <div id="kmlInfo"></div>
   </div>
 
-  <!-- 5. RESUMEN GENERAL -->
+  <!-- 5. SOBRANTES DE PRODUCTO Y MEZCLA -->
   <div class="card">
-    <h2><span class="n">5</span>Resumen general de la jornada</h2>
+    <h2><span class="n">5</span>Sobrantes de producto y de mezcla preparada</h2>
+
+    <label class="first">Sobrante de producto en físico (de esta parcela)</label>
+    <p class="hint" style="margin-top:-2px;margin-bottom:8px;">Registra cuánto quedó sin usar de cada insumo (en su envase o costal original) al terminar la jornada en esta parcela.</p>
+    <div id="sobrantesFisicosRows"></div>
+    <button class="btn btn-ghost btn-sm" onclick="agregarSobranteFisico()">+ Agregar insumo sobrante</button>
+
+    <label style="margin-top:18px;">Sobrante de mezcla ya preparada (en bombas mochila de 20 Lt)</label>
+    <p class="hint" style="margin-top:-2px;">Si sobró mezcla ya lista de algún tambo, indica cuántas bombas mochila aspersoras de 20 Lt equivalen y en qué parcela se aplicará ese sobrante.</p>
+    <div id="sobrantesMezclaLista" style="margin-top:8px;"></div>
+    <button class="btn btn-primary btn-block" style="margin-top:8px;" onclick="agregarSobranteMezcla()">+ Agregar sobrante de mezcla</button>
+  </div>
+
+  <!-- 6. RESUMEN GENERAL -->
+  <div class="card">
+    <h2><span class="n">6</span>Resumen general de la jornada</h2>
 
     <div class="summary-grid">
       <div class="stat">
@@ -625,6 +640,10 @@
         <div class="v" id="sumPhAguaProm">—</div>
         <div class="l">pH de agua (promedio)</div>
       </div>
+      <div class="stat water">
+        <div class="v" id="sumSobranteMezcla">0 Lt</div>
+        <div class="l">Sobrante de mezcla (bombas)</div>
+      </div>
     </div>
 
     <div class="progress-bar"><div class="fill" id="progFill" style="width:0%"></div></div>
@@ -639,9 +658,9 @@
     <textarea id="observaciones" placeholder="Incidencias, clima, equipo, etc."></textarea>
   </div>
 
-  <!-- 6. AVANCE DIARIO Y JORNALEROS -->
+  <!-- 7. AVANCE DIARIO Y JORNALEROS -->
   <div class="card">
-    <h2><span class="n">6</span>Avance diario y jornaleros</h2>
+    <h2><span class="n">7</span>Avance diario y jornaleros</h2>
 
     <label class="first">Avance diario en plantas</label>
     <input type="number" id="avanceDiario" min="0" placeholder="0">
@@ -664,16 +683,16 @@
     <p class="hint">Faltante = inventario real de la parcela − avance diario en plantas.</p>
   </div>
 
-  <!-- 7. RESUMEN GENERAL DEL DÍA (VARIAS PARCELAS) -->
+  <!-- 8. RESUMEN GENERAL DEL DÍA (VARIAS PARCELAS) -->
   <div class="card">
-    <h2><span class="n">7</span>Resumen general del día</h2>
+    <h2><span class="n">8</span>Resumen general del día</h2>
     <p class="hint" style="margin-top:0;">Se calcula solo, juntando todas las parcelas guardadas con la misma fecha de hoy (incluida esta jornada activa).</p>
     <div id="resumenDiaPrincipalContenido"></div>
   </div>
 
-  <!-- 8. FIRMA DE AUDITOR -->
+  <!-- 9. FIRMA DE AUDITOR -->
   <div class="card">
-    <h2><span class="n">8</span>Validación del auditor</h2>
+    <h2><span class="n">9</span>Validación del auditor</h2>
     <label class="first">Nombre del auditor</label>
     <input type="text" id="auditorNombre" value="Jorge López Carranza">
 
@@ -922,6 +941,8 @@ let estado = {
   tambos: [],   // {numero, hora, plantas, ingredientes, evidencias:{preparacion,aplicacion}, ph:{valor,foto}}
   evidenciasGenerales: [], // [{dataUrl, hora}]
   alturaMaleza: [], // [{dataUrl, alturaCm, hora}]
+  sobrantesFisicos: [], // {nombre, cantidad, unidad, parcelaDestino, parcelaDestinoIdx}
+  sobrantesMezcla: [],  // {bombas, parcelaDestino, notas}
   kml: null,    // {archivo, placemark, vertices, areaHa}
   auditor: {nombre:'Jorge López Carranza', firma:null, fecha:''},
   observaciones: '',
@@ -970,6 +991,14 @@ function iniciar(){
   }
   if(!estado.evidenciasGenerales) estado.evidenciasGenerales = [];
   if(!estado.alturaMaleza) estado.alturaMaleza = [];
+  if(!estado.sobrantesFisicos || estado.sobrantesFisicos.length===0){
+    estado.sobrantesFisicos = [{nombre:'', cantidad:'', unidad:'ml', parcelaDestino:'', parcelaDestinoIdx:''}];
+  }
+  estado.sobrantesFisicos.forEach(s=>{
+    if(s.parcelaDestino === undefined) s.parcelaDestino = '';
+    if(s.parcelaDestinoIdx === undefined) s.parcelaDestinoIdx = '';
+  });
+  if(!estado.sobrantesMezcla) estado.sobrantesMezcla = [];
   if(estado.kml === undefined) estado.kml = null;
   if(!estado.auditor) estado.auditor = {nombre:'Jorge López Carranza', firma:null, fecha:''};
   estado.tambos.forEach(t=>{
@@ -1016,6 +1045,8 @@ function iniciar(){
   pintarGaleriaGeneral();
   pintarGaleriaAlturaMaleza();
   pintarKmlInfo();
+  pintarSobrantesFisicos();
+  pintarSobrantesMezcla();
   initFirma();
   actualizarResumen();
 
@@ -1198,6 +1229,137 @@ function quitarInsumoReceta(i){
 function recetaCambio(i, campo, valor){
   estado.receta[i][campo] = valor;
   guardar();
+}
+
+/* ---------------- Sobrante de producto en físico ---------------- */
+function pintarSobrantesFisicos(){
+  const cont = document.getElementById('sobrantesFisicosRows');
+  const opcionesParcela = INVENTARIO.map((p,idx)=>`<option value="${idx}">${p.rancho} · ${p.contrato} (${p.anio})</option>`).join('');
+  cont.innerHTML = estado.sobrantesFisicos.map((ing, i)=>{
+    const esManual = ing.parcelaDestinoIdx==='' && ing.parcelaDestino;
+    return `
+    <div class="tambo-card">
+      <div class="head">
+        <span>Sobrante de insumo #${i+1}</span>
+        <button class="del" onclick="quitarSobranteFisico(${i})">✕</button>
+      </div>
+      <div class="ing-row" style="grid-template-columns:1.5fr 0.8fr 0.7fr;margin-top:4px;">
+        <input type="text" placeholder="Insumo (ej. Glifosato)" value="${ing.nombre||''}" oninput="sobranteFisicoCambio(${i},'nombre',this.value)">
+        <input type="number" placeholder="Sobrante" value="${ing.cantidad||''}" oninput="sobranteFisicoCambio(${i},'cantidad',this.value)" min="0">
+        <select onchange="sobranteFisicoCambio(${i},'unidad',this.value)">
+          ${['ml','Lt','g','kg'].map(u=>`<option value="${u}" ${ing.unidad===u?'selected':''}>${u}</option>`).join('')}
+        </select>
+      </div>
+      <label style="margin:8px 0 2px;">Parcela donde se aplicará este sobrante</label>
+      <select onchange="sobranteFisicoCambioParcela(${i}, this.value)">
+        <option value="">— Selecciona una parcela —</option>
+        ${INVENTARIO.map((p,idx)=>`<option value="${idx}" ${String(ing.parcelaDestinoIdx)===String(idx)?'selected':''}>${p.rancho} · ${p.contrato} (${p.anio})</option>`).join('')}
+        <option value="otra" ${esManual?'selected':''}>Otra parcela (no listada)</option>
+      </select>
+      ${(ing.parcelaDestinoIdx==='') ? `<input type="text" placeholder="Nombre de la parcela destino" value="${ing.parcelaDestino||''}" oninput="sobranteFisicoCambioParcelaManual(${i}, this.value)" style="margin-top:6px;">` : ''}
+    </div>`;
+  }).join('');
+}
+function agregarSobranteFisico(){
+  estado.sobrantesFisicos.push({nombre:'', cantidad:'', unidad:'ml', parcelaDestino:'', parcelaDestinoIdx:''});
+  pintarSobrantesFisicos(); guardar();
+}
+function quitarSobranteFisico(i){
+  estado.sobrantesFisicos.splice(i,1);
+  if(estado.sobrantesFisicos.length===0) estado.sobrantesFisicos.push({nombre:'', cantidad:'', unidad:'ml', parcelaDestino:'', parcelaDestinoIdx:''});
+  pintarSobrantesFisicos(); guardar();
+}
+function sobranteFisicoCambio(i, campo, valor){
+  estado.sobrantesFisicos[i][campo] = valor;
+  guardar();
+}
+function sobranteFisicoCambioParcela(i, valor){
+  const s = estado.sobrantesFisicos[i];
+  if(valor === 'otra' || valor === ''){
+    s.parcelaDestinoIdx = '';
+    s.parcelaDestino = valor === 'otra' ? '' : s.parcelaDestino;
+  }else{
+    const item = INVENTARIO[parseInt(valor)];
+    s.parcelaDestinoIdx = valor;
+    s.parcelaDestino = item.rancho + ' · ' + item.contrato;
+  }
+  pintarSobrantesFisicos();
+  guardar();
+}
+function sobranteFisicoCambioParcelaManual(i, valor){
+  estado.sobrantesFisicos[i].parcelaDestino = valor;
+  guardar();
+}
+
+/* ---------------- Sobrante de mezcla preparada (bombas mochila 20 Lt) ---------------- */
+function agregarSobranteMezcla(){
+  estado.sobrantesMezcla.push({bombas:'', parcelaDestino:'', parcelaDestinoIdx:'', notas:''});
+  pintarSobrantesMezcla();
+  actualizarResumen();
+  guardar();
+}
+function quitarSobranteMezcla(i){
+  estado.sobrantesMezcla.splice(i,1);
+  pintarSobrantesMezcla();
+  actualizarResumen();
+  guardar();
+}
+function sobranteMezclaCambioBombas(i, valor){
+  estado.sobrantesMezcla[i].bombas = valor;
+  pintarSobrantesMezcla();
+  actualizarResumen();
+  guardar();
+}
+function sobranteMezclaCambioParcela(i, valor){
+  const s = estado.sobrantesMezcla[i];
+  if(valor === 'otra'){
+    s.parcelaDestinoIdx = '';
+    s.parcelaDestino = '';
+  }else{
+    const item = INVENTARIO[parseInt(valor)];
+    s.parcelaDestinoIdx = valor;
+    s.parcelaDestino = item.rancho + ' · ' + item.contrato;
+  }
+  pintarSobrantesMezcla();
+  guardar();
+}
+function sobranteMezclaCambioParcelaManual(i, valor){
+  estado.sobrantesMezcla[i].parcelaDestino = valor;
+  guardar();
+}
+function sobranteMezclaCambioNotas(i, valor){
+  estado.sobrantesMezcla[i].notas = valor;
+  guardar();
+}
+function pintarSobrantesMezcla(){
+  const cont = document.getElementById('sobrantesMezclaLista');
+  if(!estado.sobrantesMezcla.length){
+    cont.innerHTML = '<p class="empty">Sin sobrantes de mezcla registrados.</p>';
+    return;
+  }
+  cont.innerHTML = estado.sobrantesMezcla.map((s, i)=>{
+    const litros = (parseFloat(s.bombas)||0) * 20;
+    const opcionesParcela = INVENTARIO.map((p,idx)=>`<option value="${idx}" ${String(s.parcelaDestinoIdx)===String(idx)?'selected':''}>${p.rancho} · ${p.contrato} (${p.anio})</option>`).join('');
+    const esManual = s.parcelaDestinoIdx==='' && s.parcelaDestino;
+    return `
+    <div class="tambo-card">
+      <div class="head">
+        <span>Sobrante #${i+1} · ${litros.toLocaleString('es-MX')} Lt</span>
+        <button class="del" onclick="quitarSobranteMezcla(${i})">✕</button>
+      </div>
+      <label style="margin:6px 0 2px;">Bombas mochila (20 Lt c/u)</label>
+      <input type="number" min="0" step="0.1" placeholder="Ej. 0.5" value="${s.bombas}" oninput="sobranteMezclaCambioBombas(${i}, this.value)">
+      <label style="margin:8px 0 2px;">Parcela donde se aplicará este sobrante</label>
+      <select onchange="sobranteMezclaCambioParcela(${i}, this.value)">
+        <option value="">— Selecciona una parcela —</option>
+        ${opcionesParcela}
+        <option value="otra" ${esManual?'selected':''}>Otra parcela (no listada)</option>
+      </select>
+      ${(s.parcelaDestinoIdx==='' ) ? `<input type="text" placeholder="Nombre de la parcela destino" value="${s.parcelaDestino||''}" oninput="sobranteMezclaCambioParcelaManual(${i}, this.value)" style="margin-top:6px;">` : ''}
+      <label style="margin:8px 0 2px;">Notas (opcional)</label>
+      <input type="text" placeholder="Ej. tambo #2, se aplicará mañana" value="${s.notas||''}" oninput="sobranteMezclaCambioNotas(${i}, this.value)">
+    </div>`;
+  }).join('');
 }
 
 /* ---------------- Tambos ---------------- */
@@ -1551,6 +1713,9 @@ function actualizarResumen(){
   document.getElementById('sumEvidencias').textContent = totalFotos + estado.evidenciasGenerales.length + estado.alturaMaleza.length;
   document.getElementById('sumPhProm').textContent = cuentaPh>0 ? (sumaPh/cuentaPh).toFixed(2) : '—';
   document.getElementById('sumPhAguaProm').textContent = cuentaPhAgua>0 ? (sumaPhAgua/cuentaPhAgua).toFixed(2) : '—';
+
+  const litrosSobranteMezcla = estado.sobrantesMezcla.reduce((s,x)=> s + (parseFloat(x.bombas)||0)*20, 0);
+  document.getElementById('sumSobranteMezcla').textContent = litrosSobranteMezcla.toLocaleString('es-MX') + ' Lt';
   aplicarClaseSemaforo('statPhMezcla', cuentaPh>0 ? semaforoPh(sumaPh/cuentaPh).clase : '');
   aplicarClaseSemaforo('statPhAgua', cuentaPhAgua>0 ? semaforoPh(sumaPhAgua/cuentaPhAgua).clase : '');
 
@@ -2002,6 +2167,19 @@ function renderDetalleLectura(r){
     Object.keys(consumo).map(k=>`<tr><td>${k.replace(/\s\([A-Za-z]+\)$/,'')}</td><td class="num">${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([A-Za-z]+)\)$/)||['','' ])[1]}</td></tr>`).join('') +
     `</table></div>`;
 
+  const sobrFis = (r.sobrantesFisicos||[]).filter(s=>s.nombre && s.nombre.trim()!=='');
+  if(sobrFis.length){
+    html += `<div class="detalle-section"><h3>Sobrante de producto en físico</h3><table>` +
+      sobrFis.map(s=>`<tr><td>${s.nombre}</td><td class="num">${s.cantidad} ${s.unidad}</td><td>Destino: ${s.parcelaDestino||'—'}</td></tr>`).join('') +
+      `</table></div>`;
+  }
+  const sobrMez = r.sobrantesMezcla||[];
+  if(sobrMez.length){
+    html += `<div class="detalle-section"><h3>Sobrante de mezcla preparada</h3><table>` +
+      sobrMez.map(s=>`<tr><td>${(parseFloat(s.bombas)||0)} bomba(s) · ${((parseFloat(s.bombas)||0)*20).toLocaleString('es-MX')} Lt</td><td>Destino: ${s.parcelaDestino||'—'}${s.notas?' · '+s.notas:''}</td></tr>`).join('') +
+      `</table></div>`;
+  }
+
   const pctReg = inventario>0 ? Math.round((avance/inventario)*100) : null;
   const semReg = pctReg!==null ? semaforoAvance(pctReg) : null;
   const jornalerosNum = parseFloat(r.jornaleros) || 0;
@@ -2143,6 +2321,24 @@ function generarPdfRegistro(r){
       <tr><th>#</th><th>Hora</th><th>Preparado por</th><th>Capacidad</th><th>Ingredientes</th><th>pH mezcla</th><th>pH agua</th></tr>
       ${filas || '<tr><td colspan="7">Sin tambos registrados</td></tr>'}
     </table>
+
+    ${(()=>{
+      const sf = (r.sobrantesFisicos||[]).filter(s=>s.nombre && s.nombre.trim()!=='');
+      const sm = r.sobrantesMezcla||[];
+      if(!sf.length && !sm.length) return '';
+      let out = '<h2>Sobrantes de la jornada</h2>';
+      if(sf.length){
+        out += '<table><tr><th>Insumo sobrante (producto físico)</th><th>Cantidad</th><th>Parcela destino</th></tr>' +
+          sf.map(s=>`<tr><td>${s.nombre}</td><td>${s.cantidad} ${s.unidad}</td><td>${s.parcelaDestino||'—'}</td></tr>`).join('') +
+          '</table>';
+      }
+      if(sm.length){
+        out += '<table><tr><th>Sobrante de mezcla preparada</th><th>Equivalencia</th><th>Parcela destino</th><th>Notas</th></tr>' +
+          sm.map(s=>`<tr><td>${(parseFloat(s.bombas)||0)} bomba(s) mochila 20 Lt</td><td>${((parseFloat(s.bombas)||0)*20).toLocaleString('es-MX')} Lt</td><td>${s.parcelaDestino||'—'}</td><td>${s.notas||'—'}</td></tr>`).join('') +
+          '</table>';
+      }
+      return out;
+    })()}
 
     <h2>Evidencias fotográficas</h2>
     <div class="fotos">${fotosHtml || '<p>Sin fotografías registradas.</p>'}</div>
