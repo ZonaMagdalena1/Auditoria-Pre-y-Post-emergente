@@ -692,6 +692,10 @@
     <span class="dot"></span> Guardado automáticamente en este dispositivo
   </div>
   <button class="btn btn-ghost btn-sm no-print" style="margin-top:8px;" onclick="exportarJSON()" type="button">⬇️ Exportar respaldo JSON de esta jornada</button>
+  <label class="btn btn-ghost btn-sm no-print" style="margin-top:6px;display:inline-flex;">
+    ⬆️ Restaurar desde un respaldo JSON
+    <input type="file" id="importarJsonInput" accept="application/json,.json" style="display:none;" onchange="importarJSON(this)">
+  </label>
 
 </div>
 
@@ -1315,11 +1319,21 @@ function compressImage(file, cb){
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      cb(canvas.toDataURL('image/jpeg', 0.6));
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      guardarFotoEnDispositivo(dataUrl);
+      cb(dataUrl);
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+// Guarda automáticamente cada evidencia en el dispositivo (Descargas/Galería), independiente de la app,
+// para que la fotografía no se pierda aunque falle el formulario o el navegador.
+function guardarFotoEnDispositivo(dataUrl){
+  try{
+    const ts = fmtFechaHora(new Date()).replace(/[\/: ]/g,'-');
+    descargarFoto(dataUrl, `evidencia_${ts}.jpg`);
+  }catch(e){ /* si el navegador bloquea la descarga automática, la foto sigue guardada dentro del reporte */ }
 }
 
 function onFotoInput(idx, tipo, inputEl){
@@ -1586,6 +1600,24 @@ function exportarJSON(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+// Restaura la jornada activa desde un archivo .json exportado previamente (respaldo ante fallas)
+function importarJSON(inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    let datos;
+    try{ datos = JSON.parse(e.target.result); }
+    catch(err){ alert('Ese archivo no es un respaldo JSON válido.'); inputEl.value=''; return; }
+    if(!confirm('Esto reemplaza la jornada que tienes abierta ahora mismo por la del respaldo. Si tienes datos sin guardar aquí, se perderán. ¿Continuar?')){ inputEl.value=''; return; }
+    estado = datos;
+    guardar();
+    iniciar();
+    alert('Respaldo restaurado correctamente.');
+    inputEl.value = '';
+  };
+  reader.readAsText(file);
 }
 
 /* ---------------- Nueva jornada ---------------- */
@@ -2213,7 +2245,9 @@ function anotarAlturaEnFoto(file, alturaCm, cb){
       ctx.textBaseline = 'middle';
       ctx.fillText(texto, boxX + padding, boxY + boxH/2 + 1);
 
-      cb(canvas.toDataURL('image/jpeg', 0.72));
+      const dataUrlAltura = canvas.toDataURL('image/jpeg', 0.72);
+      guardarFotoEnDispositivo(dataUrlAltura);
+      cb(dataUrlAltura);
     };
     img.src = e.target.result;
   };
@@ -2462,6 +2496,12 @@ if('serviceWorker' in navigator && !estaEnVistaPreviaEmbebida()){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('sw.js').catch(()=>{ /* si no está disponible, la app sigue funcionando normal en línea */ });
   });
+}
+
+// Pide al navegador que trate el almacenamiento de esta página como "persistente",
+// para reducir el riesgo de que borre los datos guardados si el teléfono anda bajo de espacio.
+if(navigator.storage && navigator.storage.persist){
+  navigator.storage.persist().catch(()=>{});
 }
 
 iniciar();
