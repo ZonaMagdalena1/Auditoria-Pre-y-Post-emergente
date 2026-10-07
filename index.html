@@ -566,6 +566,13 @@
 
     <div id="recetaRows"></div>
     <button class="btn btn-ghost btn-sm" onclick="agregarInsumoReceta()">+ Agregar insumo</button>
+
+    <div style="margin-top:14px;padding-top:12px;border-top:1px dashed #cfd8cf;">
+      <label class="first">Guardar esta receta como nueva (para usarla otra vez)</label>
+      <input type="text" id="recetaNombreNueva" placeholder="Nombre (ej. Post-emergente edad 2 años)">
+      <button class="btn btn-primary btn-sm" style="margin-top:6px;" onclick="guardarRecetaPropia()" type="button">💾 Guardar receta en mi catálogo</button>
+      <div id="recetasPropiasLista" style="margin-top:10px;"></div>
+    </div>
   </div>
 
   <!-- 3. REGISTRO DE TAMBOS -->
@@ -666,6 +673,27 @@
     </div>
     <p class="hint">Estándar de referencia: 3,000 a 3,500 plantas por jornalero al día.</p>
     <p class="hint">Faltante = inventario real de la parcela − avance diario en plantas.</p>
+  </div>
+
+  <!-- AVANCE PREVIO -->
+  <div class="card">
+    <h2><span class="n">＋</span>Registrar avance previo de una parcela</h2>
+    <p class="hint" style="margin-top:-6px;margin-bottom:8px;">Úsalo para dar de alta lo que ya se trabajó en días anteriores (o antes de usar esta app). Cada avance queda como un registro diario en el historial y se suma al avance acumulado de la parcela.</p>
+    <label class="first">Parcela</label>
+    <select id="previoParcela" onchange="previoCambioParcela(this.value)"></select>
+    <input type="text" id="previoParcelaManual" placeholder="Nombre de la parcela" style="display:none;margin-top:6px;">
+    <div class="row2">
+      <div><label>Fecha del avance</label><input type="date" id="previoFecha"></div>
+      <div><label>Plantas aplicadas</label><input type="number" id="previoPlantas" min="0" inputmode="numeric" placeholder="0"></div>
+    </div>
+    <div class="row2">
+      <div><label>Jornaleros</label><input type="number" id="previoJornaleros" min="0" inputmode="numeric" placeholder="Ej. 6"></div>
+      <div><label>Inventario de la parcela</label><input type="number" id="previoInventario" min="0" inputmode="numeric" placeholder="Plantas"></div>
+    </div>
+    <label>Notas (opcional)</label>
+    <input type="text" id="previoNotas" placeholder="Ej. Aplicación previa al uso de la app">
+    <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="guardarAvancePrevio()" type="button">💾 Guardar avance previo</button>
+    <div id="previoLista" style="margin-top:12px;"></div>
   </div>
 
   <!-- 8. RESUMEN GENERAL DEL DÍA (VARIAS PARCELAS) -->
@@ -1073,11 +1101,14 @@ function iniciar(){
   document.getElementById('auditorNombre').addEventListener('input', e=>{estado.auditor.nombre=e.target.value; guardar();});
 
   pintarReceta();
+  poblarRecetaPreset();
+  pintarRecetasPropias();
   pintarTambos();
   pintarSobrantesFisicos();
   pintarSobrantesMezcla();
   poblarParcelaExtraSelect();
   pintarParcelasExtra();
+  poblarPrevioParcela();
   initFirma();
   actualizarResumen();
   actualizarIndicadorEspacio();
@@ -1174,9 +1205,69 @@ function mostrarInfoParcela(item){
 }
 
 /* ---------------- Receta predefinida ---------------- */
+const KEY_RECETAS_PROPIAS = 'agave_recetas_propias';
+function cargarRecetasPropias(){
+  try{
+    const raw = localStorage.getItem(KEY_RECETAS_PROPIAS);
+    if(raw){ const a = JSON.parse(raw); if(Array.isArray(a)) return a; }
+  }catch(e){}
+  return [];
+}
+function guardarRecetasPropias(a){
+  try{ localStorage.setItem(KEY_RECETAS_PROPIAS, JSON.stringify(a)); }catch(e){ alert('No se pudo guardar la receta (almacenamiento lleno).'); }
+}
+function poblarRecetaPreset(){
+  const sel = document.getElementById('recetaPreset');
+  if(!sel) return;
+  const propias = cargarRecetasPropias();
+  sel.innerHTML = '<option value="">— Receta personalizada —</option>' +
+    Object.keys(RECETAS_PRESET).map(k=>`<option value="${k}">${RECETAS_PRESET[k].label}</option>`).join('') +
+    (propias.length ? '<optgroup label="Mis recetas">' + propias.map(r=>`<option value="u_${r.id}">${r.label}</option>`).join('') + '</optgroup>' : '');
+  sel.value = '';
+}
+function pintarRecetasPropias(){
+  const cont = document.getElementById('recetasPropiasLista');
+  if(!cont) return;
+  const propias = cargarRecetasPropias();
+  if(!propias.length){ cont.innerHTML = '<p class="hint" style="margin:0;">Aún no has guardado recetas propias. Arma la receta arriba, ponle nombre y guárdala; aparecerá en la lista "Cargar receta predefinida" bajo "Mis recetas".</p>'; return; }
+  cont.innerHTML = '<p style="font-weight:700;font-size:13px;margin:0 0 4px;">Mis recetas guardadas</p>' + propias.map(r=>`
+    <div class="historial-item" style="padding:8px 10px;">
+      <div class="top"><span>${r.label}</span></div>
+      <div class="sub" style="margin-bottom:6px;">${r.ingredientes.map(i=>i.nombre+' '+i.cantidad+' '+i.unidad).join(' · ')}</div>
+      <div class="row2">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="cargarRecetaPreset('u_${r.id}')">Usar</button>
+        <button class="btn btn-danger btn-sm" type="button" onclick="borrarRecetaPropia('${r.id}')">🗑️ Borrar</button>
+      </div>
+    </div>`).join('');
+}
+function guardarRecetaPropia(){
+  const nombre = (document.getElementById('recetaNombreNueva').value || '').trim();
+  if(!nombre){ alert('Escribe un nombre para la receta.'); return; }
+  const ings = estado.receta.filter(i=> (i.nombre||'').trim() && parseFloat(i.cantidad)>0).map(i=>({nombre:i.nombre.trim(), cantidad:parseFloat(i.cantidad), unidad:i.unidad||'ml'}));
+  if(!ings.length){ alert('Agrega al menos un insumo con su cantidad antes de guardar la receta.'); return; }
+  const propias = cargarRecetasPropias();
+  const ya = propias.findIndex(r=>r.label.toLowerCase()===nombre.toLowerCase());
+  if(ya!==-1){
+    if(!confirm('Ya existe una receta llamada "'+propias[ya].label+'". ¿Reemplazarla?')) return;
+    propias[ya].ingredientes = ings;
+  }else{
+    propias.push({id:'r'+Date.now(), label:nombre, ingredientes:ings});
+  }
+  guardarRecetasPropias(propias);
+  document.getElementById('recetaNombreNueva').value='';
+  poblarRecetaPreset(); pintarRecetasPropias();
+  alert('✅ Receta "'+nombre+'" guardada en tu catálogo.');
+}
+function borrarRecetaPropia(id){
+  const propias = cargarRecetasPropias();
+  const r = propias.find(x=>x.id===id);
+  if(!r || !confirm('¿Borrar la receta "'+r.label+'" de tu catálogo? Los tambos ya registrados no se modifican.')) return;
+  guardarRecetasPropias(propias.filter(x=>x.id!==id));
+  poblarRecetaPreset(); pintarRecetasPropias();
+}
 function cargarRecetaPreset(key){
   if(!key){ return; }
-  const preset = RECETAS_PRESET[key];
+  const preset = key.indexOf('u_')===0 ? cargarRecetasPropias().find(r=>'u_'+r.id===key) : RECETAS_PRESET[key];
   if(!preset) return;
   if(confirm('Esto reemplaza los insumos actuales de la receta con la plantilla "'+preset.label+'". ¿Continuar?')){
     estado.receta = preset.ingredientes.map(i=>({...i}));
@@ -1896,14 +1987,129 @@ function htmlTablaPorParcela(r){
   return html;
 }
 
+
+/* ---------------- Avance previo y acumulado por parcela ---------------- */
+let _previoCache = null;
+function hoyISO(){
+  const d = new Date(), p = n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+function isoAFecha(iso){ const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; }
+// Plantas ya registradas en el historial para la parcela (sin contar el registro que se está editando ni la misma fecha de la jornada activa)
+function avancePreviaParcela(nombre){
+  if(!nombre) return 0;
+  const fecha = extraerFecha(estado.fechaHora);
+  const key = nombre+'|'+fecha+'|'+(estado._editandoHistorialId||'');
+  if(_previoCache && _previoCache.key===key) return _previoCache.val;
+  let tot = 0;
+  cargarHistorial().forEach(r=>{
+    if(r.parcela!==nombre) return;
+    if(r._id && r._id===estado._editandoHistorialId) return;
+    if(!r.avancePrevio && extraerFecha(r.fechaHora)===fecha) return;
+    tot += avanceMainRegistro(r);
+  });
+  _previoCache = {key, val:tot};
+  return tot;
+}
+function poblarPrevioParcela(){
+  const sel = document.getElementById('previoParcela');
+  if(!sel) return;
+  const actual = sel.value;
+  sel.innerHTML = '<option value="">— Selecciona una parcela —</option>' +
+    INVENTARIO.map((p,i)=>`<option value="${i}">${p.rancho} · ${p.contrato} (${p.anio})</option>`).join('') +
+    '<option value="otra">Otra parcela (no listada)</option>';
+  sel.value = actual || (estado.parcelaIdx!=='' && estado.parcelaIdx!==undefined ? String(estado.parcelaIdx) : '');
+  if(!document.getElementById('previoFecha').value) document.getElementById('previoFecha').value = hoyISO();
+  previoCambioParcela(sel.value);
+}
+function previoCambioParcela(v){
+  const man = document.getElementById('previoParcelaManual');
+  man.style.display = v==='otra' ? 'block' : 'none';
+  if(v!=='' && v!=='otra'){ document.getElementById('previoInventario').value = INVENTARIO[parseInt(v)].inventario; }
+  pintarPrevioLista();
+}
+function previoNombreParcela(){
+  const v = document.getElementById('previoParcela').value;
+  if(v==='') return '';
+  if(v==='otra') return (document.getElementById('previoParcelaManual').value||'').trim();
+  const p = INVENTARIO[parseInt(v)];
+  return p.rancho + ' · ' + p.contrato;
+}
+function guardarAvancePrevio(){
+  const nombre = previoNombreParcela();
+  const iso = document.getElementById('previoFecha').value;
+  const plantas = parseFloat(document.getElementById('previoPlantas').value);
+  if(!nombre){ alert('Selecciona o escribe la parcela.'); return; }
+  if(!iso){ alert('Elige la fecha del avance.'); return; }
+  if(isNaN(plantas) || plantas<=0){ alert('Captura las plantas aplicadas (mayor a 0).'); return; }
+  const v = document.getElementById('previoParcela').value;
+  const item = (v!=='' && v!=='otra') ? INVENTARIO[parseInt(v)] : null;
+  const base = JSON.parse(JSON.stringify(estado));
+  const reg = Object.assign(base, {
+    _id: 'previo_' + Date.now(),
+    _archivadoEn: fmtFechaHora(new Date()),
+    avancePrevio: true,
+    fechaHora: isoAFecha(iso) + ' 00:00',
+    parcela: nombre,
+    parcelaIdx: item ? v : '',
+    hectareas: item ? item.has : '',
+    inventarioParcela: document.getElementById('previoInventario').value || (item ? item.inventario : ''),
+    ubicacion: null,
+    avanceDiarioManual: String(plantas),
+    jornaleros: document.getElementById('previoJornaleros').value || '',
+    receta: [], tambos: [], parcelasExtra: [], evidenciasGenerales: [], alturaMaleza: [], kml: null,
+    sobrantesFisicos: [], sobrantesMezcla: [],
+    observaciones: (document.getElementById('previoNotas').value||'').trim() || 'Avance previo registrado manualmente',
+    _editandoHistorialId: null
+  });
+  reg.auditor = Object.assign({}, reg.auditor, {firma:null});
+  const hist = cargarHistorial();
+  hist.push(reg);
+  if(!guardarHistorial(hist)) return;
+  _previoCache = null;
+  document.getElementById('previoPlantas').value='';
+  document.getElementById('previoJornaleros').value='';
+  document.getElementById('previoNotas').value='';
+  pintarPrevioLista();
+  actualizarResumen();
+  sincronizarAutomaticoSilencioso();
+  alert('✅ Avance previo guardado: '+plantas.toLocaleString('es-MX')+' plantas en '+nombre+' ('+isoAFecha(iso)+').');
+}
+function borrarAvancePrevio(id){
+  if(!confirm('¿Borrar este avance previo?')) return;
+  guardarHistorial(cargarHistorial().filter(r=>r._id!==id));
+  _previoCache = null;
+  pintarPrevioLista(); actualizarResumen();
+}
+function pintarPrevioLista(){
+  const cont = document.getElementById('previoLista');
+  if(!cont) return;
+  const nombre = previoNombreParcela();
+  if(!nombre){ cont.innerHTML=''; return; }
+  const regs = cargarHistorial().filter(r=>r.parcela===nombre).sort((a,b)=>{
+    const k = r=>{ const [d,m,y]=extraerFecha(r.fechaHora).split('/'); return y+m+d; };
+    return k(b).localeCompare(k(a));
+  });
+  const inv = parseFloat(document.getElementById('previoInventario').value) || 0;
+  const acum = regs.reduce((s,r)=>s+avanceMainRegistro(r),0);
+  let html = `<p style="font-weight:700;font-size:13px;margin:0 0 4px;">Registros diarios de ${nombre}</p>`;
+  if(!regs.length){ cont.innerHTML = html + '<p class="hint" style="margin:0;">Todavía no hay registros guardados de esta parcela.</p>'; return; }
+  html += `<table class="resumen"><thead><tr><th>Fecha</th><th class="num">Plantas</th><th class="num">Jornaleros</th><th></th></tr></thead><tbody>` +
+    regs.map(r=>`<tr><td>${extraerFecha(r.fechaHora)}${r.avancePrevio?' <span style="font-size:11px;color:#7a6a1e;">(previo)</span>':''}</td><td class="num">${avanceMainRegistro(r).toLocaleString('es-MX')}</td><td class="num">${r.jornaleros||'—'}</td><td class="num">${r.avancePrevio?`<button class="del" type="button" onclick="borrarAvancePrevio('${r._id}')">✕</button>`:''}</td></tr>`).join('') +
+    `<tr><td><b>Acumulado</b></td><td class="num"><b>${acum.toLocaleString('es-MX')}</b></td><td></td><td></td></tr></tbody></table>` +
+    (inv>0 ? `<p class="hint" style="margin:4px 0 0;">${Math.round(acum/inv*100)}% del inventario · faltan ${Math.max(inv-acum,0).toLocaleString('es-MX')} plantas</p>` : '');
+  cont.innerHTML = html;
+}
+
 /* ---------------- Resumen ---------------- */
 function actualizarResumen(){
   const totalTambos = estado.tambos.length;
   const aguaTotal = estado.tambos.reduce((s,t)=> s + (parseFloat(t.capacidad!==undefined?t.capacidad:200)||0), 0);
   const inventario = parseFloat(estado.inventarioParcela) || 0;
   const avanceDiario = parseFloat(estado.avanceDiarioManual) || 0;
-  const restante = Math.max(inventario - avanceDiario, 0);
-  const pctReal = inventario>0 ? (avanceDiario/inventario)*100 : 0;
+  const previoParcela = avancePreviaParcela(estado.parcela);
+  const restante = Math.max(inventario - previoParcela - avanceDiario, 0);
+  const pctReal = inventario>0 ? ((previoParcela+avanceDiario)/inventario)*100 : 0;
   const pct = Math.round(pctReal);
   const pctBarra = Math.max(0, Math.min(100, pct));
 
@@ -1922,7 +2128,7 @@ function actualizarResumen(){
     semEmoji = sem.emoji + ' ';
   }
   document.getElementById('progLabel').textContent = inventario>0
-    ? `${semEmoji}${pct}% del inventario de la parcela tratado (${avanceDiario.toLocaleString('es-MX')} de ${inventario.toLocaleString('es-MX')} plantas)`
+    ? `${semEmoji}${pct}% del inventario de la parcela tratado (${(previoParcela+avanceDiario).toLocaleString('es-MX')} de ${inventario.toLocaleString('es-MX')} plantas${previoParcela>0 ? ' · incluye '+previoParcela.toLocaleString('es-MX')+' de días previos' : ''})`
     : 'Captura el inventario de la parcela para calcular el % de avance';
 
   // evidencias fotográficas y pH
@@ -2046,6 +2252,7 @@ function cargarHistorial(){
   return [];
 }
 function guardarHistorial(arr){
+  _previoCache = null;
   try{
     localStorage.setItem(KEY_HISTORIAL, JSON.stringify(arr));
     return true;
@@ -2066,7 +2273,7 @@ function archivarJornadaActual(){
 
   // 2) si no, busca si ya existe un registro de esta misma parcela y fecha (evita duplicar al tocar "Guardar" varias veces)
   if(idxExistente === -1 && estado.parcela){
-    idxExistente = historial.findIndex(r=> extraerFecha(r.fechaHora)===fechaActual && r.parcela===estado.parcela);
+    idxExistente = historial.findIndex(r=> !r.avancePrevio && extraerFecha(r.fechaHora)===fechaActual && r.parcela===estado.parcela);
   }
 
   if(idxExistente !== -1){
@@ -2358,7 +2565,7 @@ function pintarHistorial(){
     const totalFotos = contarFotosRegistro(r);
     return `
       <div class="historial-item">
-        <div class="top"><span>${r.parcela || 'Sin parcela'}</span><span>${r.fechaHora || ''}</span></div>
+        <div class="top"><span>${r.parcela || 'Sin parcela'}${r.avancePrevio?' · avance previo':''}</span><span>${r.fechaHora || ''}</span></div>
         <div class="sub">Jefe de Área: ${r.jefeArea||'—'} · Supervisor: ${r.supervisor||'—'} · ${r.tambos.length} tambos · ${totalFotos} fotos</div>
         <div class="row2">
           <button class="btn btn-primary btn-sm" onclick="verDetalleRegistro('${r._id}')" type="button">Ver detalle</button>
