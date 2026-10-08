@@ -2699,8 +2699,8 @@ function renderDetalleLectura(r){
     if(t.evidencias && t.evidencias.aguaLimpia) fotos.push([t.evidencias.aguaLimpia,'Agua limpia']);
     if(t.evidencias && t.evidencias.preparacion) fotos.push([t.evidencias.preparacion,'Preparación']);
     if(t.evidencias && t.evidencias.aplicacion) fotos.push([t.evidencias.aplicacion,'Aplicación']);
-    if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'pH mezcla '+(t.ph.valor||'')]);
-    if(t.phAgua && t.phAgua.foto) fotos.push([t.phAgua.foto, 'pH agua '+(t.phAgua.valor||'')]);
+    if(t.ph && t.ph.foto) fotos.push([t.ph.foto, '<b>pH mezcla: '+(t.ph.valor||'sin capturar')+'</b>']);
+    if(t.phAgua && t.phAgua.foto) fotos.push([t.phAgua.foto, '<b>pH agua: '+(t.phAgua.valor||'sin capturar')+'</b>']);
     if(fotos.length){
       html += `<div class="detalle-fotos">` + fotos.map((f,i)=>`<div><img src="${f[0]}"><div class="cap">${f[1]}<br><button onclick="descargarFoto('${f[0]}','tambo${t.numero}_${i+1}.jpg')" type="button" style="border:none;background:none;color:var(--agave-dark);cursor:pointer;">⬇️ Descargar</button></div></div>`).join('') + `</div>`;
     }
@@ -2796,10 +2796,11 @@ function generarPdfRegistro(r){
     if(t.evidencias && t.evidencias.aguaLimpia) fotos.push([t.evidencias.aguaLimpia, 'Tambo #'+t.numero+' · Agua limpia']);
     if(t.evidencias && t.evidencias.preparacion) fotos.push([t.evidencias.preparacion, 'Tambo #'+t.numero+' · Preparación']);
     if(t.evidencias && t.evidencias.aplicacion) fotos.push([t.evidencias.aplicacion, 'Tambo #'+t.numero+' · Aplicación']);
-    if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'Tambo #'+t.numero+' · pH mezcla']);
-    if(t.phAgua && t.phAgua.foto) fotos.push([t.phAgua.foto, 'Tambo #'+t.numero+' · pH agua']);
+    if(t.ph && t.ph.foto) fotos.push([t.ph.foto, 'Tambo #'+t.numero+' · pH mezcla', t.ph.valor]);
+    if(t.phAgua && t.phAgua.foto) fotos.push([t.phAgua.foto, 'Tambo #'+t.numero+' · pH agua', t.phAgua.valor]);
     fotos.forEach(f=>{
-      fotosHtml += `<div class="foto-pdf"><img src="${f[0]}"><div class="cap">${f[1]}</div></div>`;
+      const phTxt = (f[2]!==undefined && f[2]!=='' && f[2]!==null) ? `<div class="ph-cap">pH ${f[2]}</div>` : (f.length>2 ? '<div class="ph-cap sin">pH sin capturar</div>' : '');
+      fotosHtml += `<div class="foto-pdf"><img src="${f[0]}"><div class="cap">${f[1]}</div>${phTxt}</div>`;
     });
   });
   (r.evidenciasGenerales||[]).forEach((ev,i)=>{
@@ -2812,6 +2813,13 @@ function generarPdfRegistro(r){
   const consumoHtml = Object.keys(consumo).map(k=>
     `<tr><td>${k.replace(/\s\([A-Za-z]+\)$/,'')}</td><td>${consumo[k].toLocaleString('es-MX')} ${(k.match(/\(([A-Za-z]+)\)$/)||['',''])[1]}</td></tr>`
   ).join('');
+
+  const phFooter = (r.tambos||[]).map(t=>{
+    const p = [];
+    if(t.phAgua && t.phAgua.valor!=='' && t.phAgua.valor!==undefined && t.phAgua.valor!==null) p.push('agua '+t.phAgua.valor);
+    if(t.ph && t.ph.valor!=='' && t.ph.valor!==undefined && t.ph.valor!==null) p.push('mezcla '+t.ph.valor);
+    return p.length ? 'Tambo #'+t.numero+' ('+p.join(', ')+')' : '';
+  }).filter(Boolean).join(' · ');
 
   const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
   <title>Reporte de aplicación - ${r.parcela||''} - ${r.fechaHora||''}</title>
@@ -2829,6 +2837,8 @@ function generarPdfRegistro(r){
     .foto-pdf{width:140px;}
     .foto-pdf img{width:140px;height:105px;object-fit:cover;border:1px solid #ccc;border-radius:4px;}
     .foto-pdf .cap{font-size:10px;text-align:center;color:#555;margin-top:2px;}
+    .foto-pdf .ph-cap{font-size:12px;font-weight:bold;text-align:center;color:#2F4A3C;background:#E8F1EA;border:1px solid #b9d0bf;border-radius:3px;margin-top:2px;padding:2px 0;}
+    .foto-pdf .ph-cap.sin{color:#8a2a1c;background:#FAE4E0;border-color:#e5b3ab;}
     .firma-box{margin-top:6px;}
     .firma-box img{max-width:220px;border:1px solid #ccc;border-radius:4px;}
     footer{margin-top:24px;font-size:10px;color:#888;}
@@ -2899,7 +2909,10 @@ function generarPdfRegistro(r){
     <p>${r.auditor?r.auditor.nombre:'—'} ${r.auditor && r.auditor.firma ? '— Firmado el '+r.auditor.fecha : '— Sin firmar'}</p>
     ${r.auditor && r.auditor.firma ? `<div class="firma-box"><img src="${r.auditor.firma}"></div>` : ''}
 
-    <footer>Consolidación de Agave · Reporte generado el ${fmtFechaHora(new Date())}</footer>
+    <footer>
+      ${phFooter ? `<div style="margin-bottom:4px;color:#2F4A3C;"><b>Lecturas de pH registradas con potenciómetro:</b> ${phFooter}</div>` : ''}
+      Consolidación de Agave · Reporte generado el ${fmtFechaHora(new Date())}
+    </footer>
   </body></html>`;
 
   const win = window.open('', '_blank');
