@@ -581,6 +581,11 @@
     <p class="hint" style="margin-top:-6px;margin-bottom:8px;">Cada vez que se prepara y aplica un tambo (hasta 200 Lt), regístralo aquí. Se cargan las cantidades de la receta; ajústalas si ese tambo varió.</p>
 
     <button class="btn btn-primary btn-block" onclick="abrirNuevoTambo()">+ Registrar tambo aplicado</button>
+    <label class="btn btn-ghost btn-block" style="margin-top:8px;text-align:center;">
+      📥 Recuperar fotos desde la galería
+      <input type="file" accept="image/*" multiple style="display:none;" onchange="recuperarFotosGaleria(this)">
+    </label>
+    <p class="hint" style="margin-top:4px;">Cada foto que tomas se guarda sola en tu galería/Descargas con la leyenda del tambo impresa (ej. "TAMBO #3 · pH agua"). Si el formulario se cierra o falla, vuelve a registrar los tambos y usa este botón para volver a cargar las fotos; se ubican solas por el nombre del archivo.</p>
 
     <div id="tambosLista" style="margin-top:12px;"></div>
     <div class="empty" id="tambosEmpty">Aún no se han registrado tambos.</div>
@@ -1527,6 +1532,24 @@ function tamboCambioPlantas(idx, valor){
   actualizarResumen();
   guardar();
 }
+function tamboCambioNombreIng(idx, ingIdx, valor){
+  estado.tambos[idx].ingredientes[ingIdx].nombre = valor;
+  actualizarResumen(); guardar();
+}
+function tamboCambioUnidadIng(idx, ingIdx, valor){
+  estado.tambos[idx].ingredientes[ingIdx].unidad = valor;
+  actualizarResumen(); guardar();
+}
+function tamboAgregarIng(idx){
+  estado.tambos[idx].ingredientes.push({nombre:'', dosisBase:0, cantidad:'', unidad:'ml'});
+  pintarTambos(); actualizarResumen(); guardar();
+}
+function tamboQuitarIng(idx, ingIdx){
+  const ing = estado.tambos[idx].ingredientes[ingIdx];
+  if(ing.nombre && !confirm('¿Quitar "'+ing.nombre+'" de este tambo?')) return;
+  estado.tambos[idx].ingredientes.splice(ingIdx,1);
+  pintarTambos(); actualizarResumen(); guardar();
+}
 function tamboCambioIngrediente(idx, ingIdx, valor){
   const t = estado.tambos[idx];
   const ing = t.ingredientes[ingIdx];
@@ -1604,7 +1627,7 @@ function tamboCambioPhAgua(idx, valor){
 }
 
 /* Comprime la foto en el navegador antes de guardarla (evita llenar el almacenamiento local) */
-function compressImage(file, cb){
+function compressImage(file, cb, leyenda, nombreArchivo){
   const reader = new FileReader();
   reader.onload = function(e){
     const img = new Image();
@@ -1618,8 +1641,9 @@ function compressImage(file, cb){
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         if(coordsTexto){ dibujarMarcadorGeo(ctx, w, h, coordsTexto); }
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.45);
-        guardarFotoEnDispositivo(dataUrl);
+        if(leyenda){ dibujarLeyenda(ctx, w, h, leyenda); }
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+        guardarFotoEnDispositivo(dataUrl, nombreArchivo);
         cb(dataUrl);
       });
     };
@@ -1677,16 +1701,36 @@ function dibujarMarcadorGeo(ctx, w, h, coordsTexto){
 }
 // Guarda automáticamente cada evidencia en el dispositivo (Descargas/Galería), independiente de la app,
 // para que la fotografía no se pierda aunque falle el formulario o el navegador.
-function guardarFotoEnDispositivo(dataUrl){
+function guardarFotoEnDispositivo(dataUrl, nombre){
   try{
-    const ts = fmtFechaHora(new Date()).replace(/[\/: ]/g,'-');
-    descargarFoto(dataUrl, `evidencia_${ts}.jpg`);
+    descargarFoto(dataUrl, nombre || `evidencia_${tsArchivo()}.jpg`);
   }catch(e){ /* si el navegador bloquea la descarga automática, la foto sigue guardada dentro del reporte */ }
 }
 
+const ETIQUETA_FOTO = {aguaLimpia:'Agua limpia', preparacion:'Preparación de mezcla', ph:'pH mezcla', phAgua:'pH agua'};
+function tsArchivo(){
+  const d = new Date(), p = n=>String(n).padStart(2,'0');
+  return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds());
+}
+// Banda superior con la leyenda del tambo al que pertenece la evidencia
+function dibujarLeyenda(ctx, w, h, texto){
+  const fontSize = Math.max(16, Math.round(w * 0.04));
+  ctx.font = `700 ${fontSize}px Arial, sans-serif`;
+  const bandH = Math.round(fontSize * 1.9);
+  ctx.fillStyle = 'rgba(30,42,34,0.82)';
+  ctx.fillRect(0, 0, w, bandH);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textBaseline = 'middle';
+  let t = texto;
+  while(ctx.measureText(t).width > w - 20 && t.length > 8){ t = t.slice(0,-2); }
+  ctx.fillText(t, 10, bandH/2 + 1);
+}
 function onFotoInput(idx, tipo, inputEl){
   const file = inputEl.files && inputEl.files[0];
   if(!file) return;
+  const tb = estado.tambos[idx];
+  const leyenda = 'TAMBO #'+tb.numero+' · '+(ETIQUETA_FOTO[tipo]||tipo)+' · '+fmtFechaHora(new Date())+(estado.parcela ? ' · '+estado.parcela : '');
+  const nombreArchivo = 'tambo'+tb.numero+'_'+tipo+'_'+tsArchivo()+'.jpg';
   compressImage(file, dataUrl=>{
     if(tipo==='ph'){ estado.tambos[idx].ph.foto = dataUrl; }
     else if(tipo==='phAgua'){ estado.tambos[idx].phAgua.foto = dataUrl; }
@@ -1694,6 +1738,44 @@ function onFotoInput(idx, tipo, inputEl){
     pintarTambos();
     actualizarResumen();
     guardar();
+  }, leyenda, nombreArchivo);
+  inputEl.value = '';
+}
+
+// Recupera evidencias guardadas en la galería/Descargas: el nombre del archivo indica el tambo y el tipo de foto
+function recuperarFotosGaleria(inputEl){
+  const files = Array.from(inputEl.files || []);
+  if(!files.length) return;
+  files.sort((a,b)=>a.name.localeCompare(b.name));
+  let ok = 0, sinNombre = [], creados = 0, pendientes = files.length;
+  const terminar = ()=>{
+    if(--pendientes > 0) return;
+    pintarTambos(); actualizarResumen(); guardar();
+    alert('✅ '+ok+' foto(s) recuperadas'+(creados?' ('+creados+' tambo(s) recreados; revisa sus dosis y datos)':'')+'.'+(sinNombre.length ? '\n\n⚠️ No se pudo identificar el tambo en: '+sinNombre.join(', ')+'.\nSolo se reconocen archivos con nombre tipo "tambo3_ph_...jpg" generados por esta app.' : ''));
+  };
+  files.forEach(file=>{
+    const m = file.name.match(/tambo\s*(\d+)_(aguaLimpia|preparacion|phAgua|ph)_/i);
+    if(!m){ sinNombre.push(file.name); terminar(); return; }
+    const num = parseInt(m[1]);
+    const tipo = ['aguaLimpia','preparacion','phAgua','ph'].find(x=>x.toLowerCase()===m[2].toLowerCase());
+    const reader = new FileReader();
+    reader.onload = e=>{
+      let t = estado.tambos.find(x=>x.numero===num);
+      if(!t){
+        t = {numero:num, hora:fmtFechaHora(new Date()), plantas:'', parcela:'', capacidad:200, preparadoPor:'',
+             ingredientes: estado.receta.filter(i=>i.nombre && i.nombre.trim()).map(i=>({nombre:i.nombre, dosisBase:parseFloat(i.cantidad)||0, cantidad:i.cantidad, unidad:i.unidad})),
+             evidencias:{preparacion:null, aplicacion:null, aguaLimpia:null}, ph:{valor:'',foto:null}, phAgua:{valor:'',foto:null}};
+        estado.tambos.push(t);
+        estado.tambos.sort((a,b)=>a.numero-b.numero);
+        creados++;
+      }
+      if(tipo==='ph') t.ph.foto = e.target.result;
+      else if(tipo==='phAgua') t.phAgua.foto = e.target.result;
+      else t.evidencias[tipo] = e.target.result;
+      ok++; terminar();
+    };
+    reader.onerror = ()=>{ sinNombre.push(file.name); terminar(); };
+    reader.readAsDataURL(file);
   });
   inputEl.value = '';
 }
@@ -1783,12 +1865,17 @@ function pintarTambos(){
 
       <label style="margin:10px 0 2px;">Ingredientes usados</label>
       ${t.ingredientes.map((ing,i)=>`
-        <div class="ing-row" style="grid-template-columns:1.5fr 0.8fr 0.7fr;">
-          <input type="text" value="${ing.nombre}" disabled>
-          <input type="number" id="ing_${idx}_${i}" value="${ing.cantidad}" oninput="tamboCambioIngrediente(${idx},${i},this.value)">
-          <input type="text" value="${ing.unidad}" disabled>
+        <div class="ing-row" style="grid-template-columns:1.4fr 0.8fr 0.7fr auto;">
+          <input type="text" placeholder="Producto" value="${(ing.nombre||'').replace(/"/g,'&quot;')}" oninput="tamboCambioNombreIng(${idx},${i},this.value)">
+          <input type="number" id="ing_${idx}_${i}" min="0" step="any" inputmode="decimal" value="${ing.cantidad}" oninput="tamboCambioIngrediente(${idx},${i},this.value)">
+          <select onchange="tamboCambioUnidadIng(${idx},${i},this.value)">
+            ${['ml','Lt','g','kg'].map(u=>`<option value="${u}" ${ing.unidad===u?'selected':''}>${u}</option>`).join('')}
+          </select>
+          <button class="del" type="button" onclick="tamboQuitarIng(${idx},${i})">✕</button>
         </div>
       `).join('')}
+      <button class="btn btn-ghost btn-sm" type="button" onclick="tamboAgregarIng(${idx})">+ Agregar producto a este tambo</button>
+      <p class="hint" style="margin-top:4px;">Puedes corregir la dosis, cambiar el producto o quitarlo. Las cantidades son las de este tambo (ya ajustadas a sus litros).</p>
 
       <div class="evid-block">
         <label style="margin-bottom:2px;">Evidencias · Tambo #${t.numero}</label>
